@@ -1,5 +1,5 @@
 # W I P Discord Bot
-## Made with Node.js, Discord.js and TypeScript
+Made with Node.js, Discord.js and TypeScript
 
 ## TO DO:
 
@@ -12,3 +12,5 @@
 - Moderation
 - Economy
 - Role-Reactions/Verifications
+
+Detailed TODO's in GitHub issues
