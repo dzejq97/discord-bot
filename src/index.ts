@@ -1,4 +1,5 @@
 import MainClient from "./main_client";
+import { Token } from './config.json'
 
 import path from "node:path";
 import fs from "node:fs";
@@ -18,9 +19,4 @@ for (const file of eventFiles) {
     }
 }
 
-client.logger.log('wczytywanie twojej starej');
-client.logger.success('twoja stara załadowana');
-client.logger.log('wczytywanie twojego starego');
-client.logger.failed('błąd podczas wczytywania twojego starego');
-client.logger.error('twój stary leży najebany na wersalce')
-
+client.login(Token);
