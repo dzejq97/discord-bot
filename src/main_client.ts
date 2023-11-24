@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
 import options from './dependencies/client_options';
-import Logger from './interfaces/logger';
+import Logger from './classes/Logger';
 
 export default class MainClient extends Client {
     constructor(){
