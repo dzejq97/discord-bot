@@ -1,6 +1,6 @@
 import { ICommand } from "src/interfaces/ICommand";
 
-const command: ICommand = {
+export const command: ICommand = {
     meta: {
         name: 'ping',
         aliases: ['pong'],
@@ -10,5 +10,3 @@ const command: ICommand = {
 
     }
 }
-
-export default command;
