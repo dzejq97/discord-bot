@@ -43,17 +43,23 @@ export default class CommandsManager {
         if (!msg.guild || msg.author.bot) return;
 
         // Search all provided aliases
-        let usedAlias: string;
+        let usedAlias: string = "";
         for (const alias of this.aliases) {
             if (msg.content.startsWith(alias)) usedAlias = alias;
         }
-        if (!usedAlias) return;
-        
+        // Stop if no alias detected
+        if (usedAlias === "") return;
+
+        // Split command trigger message into arguments
         const commandArgs: string[] = msg.content.substring(usedAlias.length).split(' ');
-        const commandName: string = commandArgs.shift()?.toLowerCase();
+        const commandName = commandArgs.shift()?.toLowerCase();
+
+        // Return if cant split message into arguments (maybe only prefix without command?)
+        // TODO: Test it
+        if(!commandName) return;
 
         this.commands.forEach(category => {
-            
+
         })
     }
 }
