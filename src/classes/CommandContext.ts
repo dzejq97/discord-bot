@@ -1,13 +1,8 @@
 
 
-// Using class
-export class CommandContext {
+
+export default class CommandContext {
     constructor() {
 
     }
-}
-
-// Or interface
-export interface ICommandContext {
-    
 }

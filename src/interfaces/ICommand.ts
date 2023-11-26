@@ -1,4 +1,4 @@
-import CommandContext from 'src/classes/CommandContext';
+import CommandContext from "src/classes/CommandContext";
 
 export interface ICommand {
     meta: {
