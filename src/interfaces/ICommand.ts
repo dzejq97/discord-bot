@@ -1,4 +1,4 @@
-import CommandContext from "src/classes/CommandContext";
+import { IContext } from "./IContext";
 
 export interface ICommand {
     meta: {
@@ -9,5 +9,5 @@ export interface ICommand {
         category?: string,
         delete_message_on_trigger?: boolean;
     },
-    execute(context: CommandContext):void;
+    execute(context: IContext):void;
 }
