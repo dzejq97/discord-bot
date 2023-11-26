@@ -9,7 +9,7 @@ import { ICommand } from "src/interfaces/ICommand";
 export default class CommandsManager {
     client: MainClient;
     // Collection of categories contains collection of commands
-    commands: Collection<string, Collection<string, ICommand>>;
+    commands: Collection<string, Collection<string, ICommand>> | null = null;
     constructor(client: MainClient) {
         this.client = client;
         
