@@ -7,6 +7,7 @@ export interface ICommand {
         requiredPermissions?: bigint[],
         description?: string,
         category?: string,
+        delete_message_on_trigger?: boolean;
     },
     execute(context: CommandContext):void;
 }

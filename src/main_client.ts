@@ -15,4 +15,8 @@ export default class MainClient extends Client {
     }
     database_manager?: any; // Place for database manager
 
+    loadEvents() {
+        // TODO: Place for loading events files
+        return;
+    }
 }
