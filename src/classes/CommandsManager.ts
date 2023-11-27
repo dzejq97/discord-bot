@@ -59,6 +59,9 @@ export default class CommandsManager {
         const commandArgs: string[] = msg.content.substring(usedPrefix.length).split(' ');
         const commandName = commandArgs.shift()?.toLowerCase();
 
+        if (commandArgs.length > 0) context.arguments = commandArgs;
+        else context.arguments = [];
+
         if(!commandName) return;
 
         this.commands_categories.forEach(category => {

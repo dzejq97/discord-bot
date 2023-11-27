@@ -2,4 +2,4 @@ node_modules
 dist
 package-lock.json
 debug.log
-*.json
+src/config.json

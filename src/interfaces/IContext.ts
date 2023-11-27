@@ -6,4 +6,5 @@ export interface IContext {
     message?: Message;
     used_prefix?: string;
     used_alias?: string;
+    arguments?: string[];
 }
