@@ -1,14 +1,25 @@
 import { Client } from 'discord.js';
-import options from './dependencies/client_options';
-import Logger from './classes/logger';
+
+import intents from './dependencies/intents';
+
+import Logger from './classes/Logger';
+import CommandsManager from './classes/CommandsManager';
+
+
 
 export default class MainClient extends Client {
-    constructor(){
-        super(options);
-        this.logger = new Logger();
-    }
-    commands_manager?: any; // Place for commands manager
-    database_manager?: any; // Place for database manager
-    logger: Logger; // Place for logger
+    logger: Logger = new Logger();
+    commands_manager: CommandsManager;
 
+    constructor(){
+        super(intents);
+
+        this.commands_manager = new CommandsManager(this);
+    }
+    database_manager?: any; // Place for database manager
+
+    loadEvents() {
+        // TODO: Place for loading events files
+        return;
+    }
 }
