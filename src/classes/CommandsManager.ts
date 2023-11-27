@@ -1,5 +1,5 @@
-import MainClient from "src/main_client";
-import { Prefixes } from "src/config.json";
+import MainClient from "../main_client";
+import { Prefixes } from "../config.json";
 
 import fs from 'node:fs';
 import path, { dirname } from 'node:path';
@@ -18,10 +18,11 @@ export default class CommandsManager {
         this.client = client;
         this.prefixes = Prefixes;
 
-        // Loading commands_categories files
-        const categoriesPath = path.join(__dirname, '/../commands_categories');
+        this.client.logger.info("Loading commands")
+        const categoriesPath = path.join(__dirname, '/../commands');
         const categoriesFolders = fs.readdirSync(categoriesPath);
         for (const category of categoriesFolders) {
+            this.client.logger.info(`Loading commands from ${category}:`);
             const commandsPath = path.join(categoriesPath, category);
             const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.ts'));
             // Format category name
@@ -29,13 +30,15 @@ export default class CommandsManager {
             categoryName = `${categoryName.charAt(0).toUpperCase()}${categoryName.substring(1)}`
 
             for ( const file of commandsFiles) {
+                this.client.logger.info(`Loading ${file} command.`)
                 const filePath = path.join(commandsPath, file);
                 const command: ICommand = require(filePath).command;
                 command.meta.category = categoryName;
                 this.commands_categories.set(command.meta.category, new Collection<string, ICommand>().set(command.meta.name, command))
             }
+        this.client.logger.success(`Loaded commands from ${category}`);
         }
-        console.log(this.commands_categories);
+        this.client.logger.success('All commands loaded.')
     }
 
     // Seek for trigger of command in message content

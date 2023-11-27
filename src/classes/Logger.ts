@@ -13,10 +13,10 @@ export default class Logger {
         return new Date().toLocaleString()
     }
 
-    log(msg: string) {
+    info(msg: string) {
         let str = `${this.timestamp()}|INFO: ${msg}`;
         this.WriteFile.write(str);
-        str = `${chalk.gray(this.timestamp())} ${chalk.greenBright('INFO')} ${msg}`;
+        str = `${chalk.gray(this.timestamp())} ${chalk.gray('INFO')} ${msg}`;
         console.log(str);
     }
 
