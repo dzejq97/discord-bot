@@ -13,29 +13,31 @@ export default class Logger {
         return new Date().toLocaleString()
     }
 
-    log(msg: string) {
-        this.WriteFile.write(`${this.timestamp()}: ${msg}\n`)
-        console.log(`${chalk.gray(this.timestamp())} ${msg}`);
+    info(msg: string) {
+        let str = `${this.timestamp()}|INFO: ${msg}`;
+        this.WriteFile.write(str);
+        str = `${chalk.gray(this.timestamp())} ${chalk.gray('INFO')} ${msg}`;
+        console.log(str);
     }
 
     success(msg: string) {
-        let str = `${this.timestamp()} SUCCESS: ${msg}`;
+        let str = `${this.timestamp()}|SUCCESS: ${msg}`;
         this.WriteFile.write(str);
-        str = `${chalk.gray(this.timestamp())} ${chalk.bgGreen('SUCCESS')} ${msg}`;
+        str = `${chalk.gray(this.timestamp())} ${chalk.green('SUCCESS')} ${msg}`;
         console.log(str);
     }
 
     failed(msg: string) {
-        let str = `${this.timestamp()} FAILED: ${msg}`;
+        let str = `${this.timestamp()}|FAILED: ${msg}`;
         this.WriteFile.write(str);
-        str = `${chalk.gray(this.timestamp())} ${chalk.bgYellow('FAILED')} ${msg}`;
+        str = `${chalk.gray(this.timestamp())} ${chalk.yellow('FAILED')} ${msg}`;
         console.log(str);
     }
 
     error(msg: string) {
-        let str = `${this.timestamp()} ERROR: ${msg}`;
+        let str = `${this.timestamp()}|ERROR: ${msg}`;
         this.WriteFile.write(str);
-        str = `${chalk.gray(this.timestamp())} ${chalk.bgRed('ERROR')} ${msg}`;
+        str = `${chalk.gray(this.timestamp())} ${chalk.red('ERROR')} ${msg}`;
         console.log(str);
     }
 }
