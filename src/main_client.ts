@@ -1,4 +1,6 @@
 import { Client } from 'discord.js';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import intents from './dependencies/intents';
 
@@ -19,7 +21,16 @@ export default class MainClient extends Client {
     database_manager?: any; // Place for database manager
 
     loadEvents() {
-        // TODO: Place for loading events files
-        return;
+        const eventsPath = path.join(__dirname, 'events');
+        const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.ts'));
+        for (const file of eventFiles) {
+            const filePath = path.join(eventsPath, file);
+            const event = require(filePath);
+            if (event.once) {
+                this.once(event.name, (...args) => event.execute(...args));
+            } else {
+                this.on(event.name, (...args) => event.execute(...args));
+            }
+        }
     }
 }
