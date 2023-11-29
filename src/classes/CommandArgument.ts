@@ -1,22 +1,22 @@
 
 export default class ComandArgument {
-    argument: string;
+    content: string;
 
     constructor(argument: string) {
-        this.argument = argument
+        this.content = argument
     }
 
     isMemberMention(): boolean {
-        if (this.argument.startsWith("<@") && this.argument.endsWith(">")) return true;
+        if (this.content.startsWith("<@") && this.content.endsWith(">")) return true;
         return false;
     }
 
     isRoleMention(): boolean {
-        if (this.argument.startsWith("<@&") && this.argument.endsWith(">")) return true;
+        if (this.content.startsWith("<@&") && this.content.endsWith(">")) return true;
         return false;
     }
     isChannelMention(): boolean {
-        if (this.argument.startsWith("<#") && this.argument.endsWith(">")) return true;
+        if (this.content.startsWith("<#") && this.content.endsWith(">")) return true;
         return false;
     }
 }
