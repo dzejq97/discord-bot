@@ -5,15 +5,14 @@ import fs from 'node:fs';
 import path, { dirname } from 'node:path';
 
 import { Message, Collection } from 'discord.js';
-import { ICommand } from "src/interfaces/ICommand";
-import { IContext } from "src/interfaces/IContext";
+import { ICommand, IContext } from "src/interfaces/ICommand";
+import ComandArgument from "./CommandArgument";
 
 export default class CommandsManager {
     client: MainClient;
     prefixes: string[];
-
-    // Collection of categories contains collection of commands_categories
     commands_categories: Collection<string, Collection<string, ICommand>> = new Collection();
+
     constructor(client: MainClient) {
         this.client = client;
         this.prefixes = Prefixes;
@@ -42,45 +41,58 @@ export default class CommandsManager {
     }
 
     // Seek for trigger of command in message content
-    seekCommand(msg: Message) {
-        if (!msg.guild || msg.author.bot) return;
+    seekCommand(msg: Message): boolean {
+        if (!msg.guild || msg.author.bot) return false;
 
         let usedPrefix: string = "";
         for (const prefix of this.prefixes) {
             if (msg.content.startsWith(prefix)) usedPrefix = prefix;
         }
-        if (usedPrefix === "") return;
+        if (usedPrefix === "") return false;
 
-        const context: IContext = {};
+        const context: IContext = {client: this.client, commands_manager: this, message: msg};
         context.used_prefix = usedPrefix;
         context.message = msg;
-        context.client = this.client;
+        context.arguments = new Array();
 
         const commandArgs: string[] = msg.content.substring(usedPrefix.length).split(' ');
         const commandName = commandArgs.shift()?.toLowerCase();
 
-        if (commandArgs.length > 0) context.arguments = commandArgs;
-        else context.arguments = [];
+        if (commandArgs.length > 0) {
+            for (const arg of commandArgs) context.arguments.push(new ComandArgument(arg));
+        }
+        else context.arguments = null;
 
-        if(!commandName) return;
+        if(!commandName) return false;
 
         this.commands_categories.forEach(category => {
             category.forEach(command => {
                 if (command.meta.name === commandName) {
                     context.used_alias = commandName;
                     command.execute(context);
-                    return;
+                    return true;
                 } else {
-                    command.meta.aliases.forEach(alias => {
+                    command.meta.aliases?.forEach(alias => {
                         if (alias === commandName) {
                             context.used_alias = commandName;
                             command.execute(context);
-                            return;
+                            return true;
                         }
                     })
                 }
 
             })
         })
+        return false;
+    }
+
+    argumentIsMemberMention(arg: string): boolean {
+        if (arg.startsWith('<@') && arg.endsWith(">")) return true;
+        return false;
+    }
+
+    argumentIsChannelMention(arg: string): boolean {
+        if (arg.startsWith("<#") && arg.endsWith(">")) return true;
+        return false;
     }
 }
