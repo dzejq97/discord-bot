@@ -59,7 +59,7 @@ export default class CommandsManager {
         const commandName = commandArgs.shift()?.toLowerCase();
 
         if (commandArgs.length > 0) {
-            for (const arg of commandArgs) context.arguments.push(new ComandArgument(arg));
+            for (const arg of commandArgs) context.arguments.push(new ComandArgument(arg, this.client, msg));
         }
         else context.arguments = null;
 

@@ -8,7 +8,7 @@ import { Token } from './config.json'
 
 const client = new MainClient();
 client.loadEvents();
-
+client.logger.info("Logging in...");
 client.login(Token);
 
 export default client;
