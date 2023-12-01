@@ -7,6 +7,7 @@ import intents from './dependencies/intents';
 import Logger from './classes/Logger';
 import CommandsManager from './classes/CommandsManager';
 import EmbedsManager from './classes/EmbedsManager';
+import { PrismaClient, User, Prisma } from "@prisma/client";
 
 
 
@@ -14,6 +15,7 @@ export default class MainClient extends Client {
     logger: Logger = new Logger();
     embeds: EmbedsManager = new EmbedsManager();
     commands_manager: CommandsManager;
+    prisma: PrismaClient = new PrismaClient();
 
 
     constructor(){
