@@ -6,6 +6,16 @@ export = {
     once: false,
 
     async execute(client: MainClient, guild: Guild) {
+
+        try {
+            await client.prisma.guild.delete({
+                where: {
+                    id: guild.id,
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
         return;
     }
 };
