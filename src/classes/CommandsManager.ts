@@ -2,7 +2,7 @@ import MainClient from "../main_client";
 import { Prefixes } from "../config.json";
 
 import fs from 'node:fs';
-import path, { dirname } from 'node:path';
+import path from 'node:path';
 
 import { Message, Collection } from 'discord.js';
 import { ICommand, IContext } from "src/interfaces/ICommand";
@@ -11,7 +11,7 @@ import ComandArgument from "./CommandArgument";
 export default class CommandsManager {
     client: MainClient;
     prefixes: string[];
-    commands_categories: Collection<string, Collection<string, ICommand>> = new Collection();
+    commands: Collection<string, Collection<string, ICommand>> = new Collection();
 
     constructor(client: MainClient) {
         this.client = client;
@@ -33,7 +33,7 @@ export default class CommandsManager {
                 const filePath = path.join(commandsPath, file);
                 const command: ICommand = require(filePath).command;
                 command.meta.category = categoryName;
-                this.commands_categories.set(command.meta.category, new Collection<string, ICommand>().set(command.meta.name, command))
+                this.commands.set(command.meta.category, new Collection<string, ICommand>().set(command.meta.name, command))
             }
         this.client.logger.success(`Loaded commands from ${category}`);
         }
@@ -65,7 +65,7 @@ export default class CommandsManager {
 
         if(!commandName) return false;
 
-        this.commands_categories.forEach(category => {
+        this.commands.forEach(category => {
             category.forEach(command => {
                 if (command.meta.name === commandName) {
                     context.used_alias = commandName;
