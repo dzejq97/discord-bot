@@ -7,15 +7,13 @@ export = {
 
     async execute(client: MainClient, member: GuildMember) {
         try {
-            await client.prisma.user.upsert({
-                where: {
-                    id: member.user.id,
-                },
-                update: {},
-                create: {
-                    id: member.user.id,
-                }
-            });
+            if (!await client.prisma.user.findUnique({where: { id: member.user.id}})) {
+                await client.prisma.user.create({
+                    data: {
+                        id: member.user.id,
+                    }
+                })
+            }
         } catch (error) {
             console.log(error);
         }

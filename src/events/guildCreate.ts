@@ -7,20 +7,16 @@ export = {
 
     async execute(client: MainClient, guild: Guild) {
         try {
-            await client.prisma.guild.upsert({
-                where: {
-                    id: guild.id,
-                },
-                update: {},
-                create: {
-                    id: guild.id,
-                    owner_id: guild.ownerId,
-                }
-            })
+            if (!await client.prisma.guild.findUnique({where: { id: guild.id}})) {
+                await client.prisma.guild.create({
+                    data: {
+                        id: guild.id,
+                        owner_id: guild.ownerId,
+                    }
+                })
+            }
         } catch (error) {
             console.log(error);
         }
-        
-        return;
     }
 };
