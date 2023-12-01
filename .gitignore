@@ -3,6 +3,7 @@ dist
 package-lock.json
 debug.log
 src/config.json
+
 *.env
 /prisma/*.db
 /prisma/*.db-journal

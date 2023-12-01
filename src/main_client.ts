@@ -24,16 +24,19 @@ export default class MainClient extends Client {
     database_manager?: any; // Place for database manager
 
     loadEvents() {
+        this.logger.info('Loading events:')
         const eventsPath = path.join(__dirname, 'events');
         const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.ts'));
         for (const file of eventFiles) {
+            this.logger.info(`Loading: ${file}`)
             const filePath = path.join(eventsPath, file);
             const event = require(filePath);
             if (event.once) {
-                this.once(event.name, (...args) => event.execute(...args));
+                this.once(event.name, (...args) => event.execute(this, ...args));
             } else {
-                this.on(event.name, (...args) => event.execute(...args));
+                this.on(event.name, (...args) => event.execute(this, ...args));
             }
+            this.logger.success(`${file} loaded`)
         }
     }
 }

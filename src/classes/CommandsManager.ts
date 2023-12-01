@@ -35,7 +35,7 @@ export default class CommandsManager {
                 command.meta.category = categoryName;
                 this.commands.set(command.meta.category, new Collection<string, ICommand>().set(command.meta.name, command))
             }
-        this.client.logger.success(`Loaded commands from ${category}`);
+            this.client.logger.success(`Loaded commands from ${category}`);
         }
         this.client.logger.success('All commands loaded.')
     }

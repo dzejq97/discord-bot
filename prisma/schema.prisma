@@ -13,4 +13,9 @@ datasource db {
 model User {
   id String @unique
   name String
+  join_at DateTime @default(now())
+  money Int @default(0)
+  reputation Int @default(0)
+  experience Int @default(0)
+  level Int @default(0)
 }
