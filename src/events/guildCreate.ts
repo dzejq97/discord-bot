@@ -6,6 +6,7 @@ export = {
     once: false,
 
     async execute(client: MainClient, guild: Guild) {
+        client.logger.info(`guild joined ${guild.name}:${guild.id}`);
         try {
             if (!await client.prisma.guild.findUnique({where: { id: guild.id}})) {
                 await client.prisma.guild.create({
@@ -15,8 +16,12 @@ export = {
                     }
                 })
             }
+
+            client.logger.info(`database added ${guild.name}:${guild.id}`);
         } catch (error) {
+            client.logger.error(`failed adding guild database record ${guild.name}:${guild.id}`);
             console.log(error);
         }
+
     }
 };

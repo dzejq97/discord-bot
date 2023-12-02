@@ -9,7 +9,6 @@ export = {
         client.logger.success(`Client ready! Logged in as ${client.user?.tag}`);
 
         client.logger.info("Synchronizing database");
-        
         (await client.guilds.fetch()).forEach(async OAGuild => {
             const guild = await OAGuild.fetch();
             if (!await client.prisma.guild.findUnique({where: {id: guild.id}})) {
