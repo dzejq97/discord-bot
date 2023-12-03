@@ -1,7 +1,7 @@
-import MainClient from "src/main_client";
+import MainClient from "src/classes/CustomClient";
 import { GuildBasedChannel, GuildMember, Message, Role } from "discord.js";
 
-export default class ComandArgument {
+export default class CommandArgument {
     content: string;
     client: MainClient;
     message: Message;
@@ -21,9 +21,11 @@ export default class ComandArgument {
         if (!this.isMemberMention() || !this.message.guild) return null;
 
         const member_id = this.content.substring(2, this.content.length - 1);
+        console.log(member_id);
 
         try {
-            return await this.message.guild.members.fetch(member_id);
+            const memb = await this.message.guild.members.fetch(member_id);
+            return memb;
         } catch (err) {
             console.log(err);
             return null;

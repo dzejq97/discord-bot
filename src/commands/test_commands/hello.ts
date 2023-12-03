@@ -1,4 +1,5 @@
-import { ICommand, IContext } from "src/interfaces/ICommand";
+import { ICommand } from "src/interfaces/ICommand";
+import CommandContext from "src/classes/CommandContext";
 
 export const command: ICommand = {
     meta: {
@@ -6,7 +7,7 @@ export const command: ICommand = {
         aliases: ['hi']
     },
 
-    async execute(context: IContext) {
+    async execute(context: CommandContext) {
         const manager = context.commands_manager;
 
         if (!context.arguments)

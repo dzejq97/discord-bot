@@ -1,4 +1,4 @@
-import { ClientOptions, GatewayIntentBits } from 'discord.js';
+import { ClientOptions, GatewayIntentBits, IntentsBitField } from 'discord.js';
 
 const options: ClientOptions = { intents: [
     GatewayIntentBits.DirectMessages,

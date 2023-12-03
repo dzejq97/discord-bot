@@ -3,12 +3,11 @@
 // Created with <3 by Dawid Niedziółka @SZajbuS
 // dniedziolka1997@gmail.com
 
-import MainClient from "./main_client";
+import CustomClient from "./classes/CustomClient";
 import { Token } from './config.json'
 
-const client = new MainClient();
-client.loadEvents();
-client.logger.info("Logging in...");
-client.login(Token);
 
-export default client;
+const client = new CustomClient();
+client.init();
+
+client.login(Token);
