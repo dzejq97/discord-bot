@@ -23,4 +23,5 @@ model Guild {
   id String @unique
   join_at DateTime @default(now())
   owner_id String
+  mute_role_id String
 }
