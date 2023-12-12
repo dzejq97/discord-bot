@@ -1,8 +1,6 @@
 import { ICommand } from "src/interfaces/ICommand";
 import CommandContext from "src/classes/CommandContext";
 import { PermissionFlagsBits } from "discord.js";
-import { Collection } from "discord.js";
-import { error } from "console";
 
 export const command: ICommand = {
     meta: {
@@ -43,7 +41,7 @@ export const command: ICommand = {
             try {
                 await context.message.channel.send({embeds: [emb]});
 
-                await banMember.ban();
+                //await banMember.ban();
                 return;
             } catch (error) {
                 return console.log(error);
@@ -56,7 +54,7 @@ export const command: ICommand = {
             try {
                 await context.message.channel.send({embeds: [emb]});
 
-                await banMember.ban({reason: reason});
+                //await banMember.ban({reason: reason});
                 return;
             } catch (error) {
                 console.log(error);
