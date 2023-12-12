@@ -25,3 +25,7 @@ model Guild {
   owner_id String
   mute_role_id String
 }
+
+model Mute {
+  id Int @id @default(autoincrement())
+}
