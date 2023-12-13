@@ -8,6 +8,7 @@ export const command: ICommand = {
         name: "mute",
         aliases: ["m"],
         requiredPermissions: [PermissionFlagsBits.BanMembers],
+        arguments_format: "",
     },
 
     async execute(context: CommandContext) {
@@ -19,7 +20,7 @@ export const command: ICommand = {
 
         let muteMember;
         try {
-            muteMember = await context.arguments.shift()?.getMember();
+            muteMember = await context.arguments.shift()?.parseToMember();
             if (!muteMember) return context.message.reply({embeds: [context.client.embeds.info('Cannot find member')]});
         } catch (error) {
             return console.log(error);

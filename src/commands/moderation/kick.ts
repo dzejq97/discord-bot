@@ -19,7 +19,7 @@ export const command: ICommand = {
         let kickMember;
 
         try {
-            kickMember = await context.arguments.shift()?.getMember();
+            kickMember = await context.arguments.shift()?.parseToMember();
         } catch (error) {
             return console.log(error);
         }

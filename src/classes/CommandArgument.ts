@@ -17,7 +17,7 @@ export default class CommandArgument {
         return false;
     }
 
-    async getMember(): Promise<GuildMember | null> {
+    async parseToMember(): Promise<GuildMember | null> {
         if (!this.isMemberMention() || !this.message.guild) return null;
 
         const member_id = this.content.substring(2, this.content.length - 1);
@@ -37,7 +37,7 @@ export default class CommandArgument {
         return false;
     }
 
-    async getRole(): Promise<Role | null> {
+    async parseToRole(): Promise<Role | null> {
         if (!this.isRoleMention() || !this.message.guild) return null;
 
         const role_id = this.content.substring(3, this.content.length - 1)
@@ -57,7 +57,7 @@ export default class CommandArgument {
         return false;
     }
 
-    async getChannel(): Promise<GuildBasedChannel | null> {
+    async parseToChannel(): Promise<GuildBasedChannel | null> {
         if (!this.isChannelMention() || !this.message.guild) return null;
 
         const channel_id = this.content.substring(2, this.content.length - 1)
