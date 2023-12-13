@@ -11,7 +11,7 @@ export const command: ICommand = {
     },
     async execute(context: CommandContext) {
         if (!context.message.member) return;
-        if (!this.meta.requiredPermissions || !context.message.member.permissions.has(this.meta.requiredPermissions[0]))
+        if (!this.meta.requiredPermissions || !context.message.member.permissions.has(this.meta.requiredPermissions))
             return;
         if (!context.arguments || !context.arguments[0].isMemberMention())
             return context.message.reply({embeds: [context.client.embeds.info('Use !kick [user] <reason>')]});
