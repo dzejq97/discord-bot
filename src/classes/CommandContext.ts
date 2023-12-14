@@ -39,6 +39,7 @@ export default class CommandContext {
     used_prefix?: string;
     used_alias?: string;
     arguments?: Array<ComandArgument>;
+    parsed_arguments?: Collection<string, any>;
     constructor (client: MainClient, commands_manager: CommandsManager, message: Message) {
         this.client = client;
         this.commands_manager = commands_manager;
@@ -54,28 +55,37 @@ export default class CommandContext {
     async parseArguments(format: string | undefined) {
         if(!format || !this.arguments) return false;
 
-        let ElementsCollection: Collection<number, IParserElement> = new Collection();
+        const ArgumentsTypes: IParserElement[] = [];
+        let lastIsMultiString: boolean = false;
 
         let i = 0;
-        let multi_string_check = 0;
-        format.split(" ").forEach( str => {
-            // Create element and give index
-            let el: IParserElement = {
+        for (let str of format.split(' ')) {
+            if (lastIsMultiString) break;
+
+            const el: IParserElement = {
                 index: i,
             };
 
-            // Check if argument is passed as optional
             if (str.startsWith('<') && str.endsWith('>')) el.optional = false;
             else if (str.startsWith('[') && str.endsWith(']')) el.optional = true;
             else return false;
 
-            //Check type
             const typeName = str.substring(1, str.length - 1);
-            if (usableTypes.includes(typeName)) el.type = typeName;
-            else return false;
-            i++;
-        });
+            if (usableTypes.includes(typeName)) {
+                el.type = typeName;
+                if (el.type === 'multi_string') lastIsMultiString = true;
+            } else return false;
 
-        for (const arg of this.arguments) return;
+            ArgumentsTypes.push(el);
+            i++;
+        }
+
+        // Too much arguments without <multi_string> at end of format
+        if (!lastIsMultiString && this.arguments.length > ArgumentsTypes.length) return false;
+
+        i = 0;
+        for (const arg of this.arguments) {
+
+        }
     }
 }
