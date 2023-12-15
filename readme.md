@@ -11,9 +11,11 @@ Made with Node.js, Discord.js, Prisma and TypeScript
 
 ## Installation
 Clone repository:
+> `git clone https://github.com/dzejq97/discord-bot.git`
 
 
 ## TO DO:
+- [x] Moderation
 - [ ] Economy
 - [ ] Role-Reactions/Verifications
 - [ ] Tickets
