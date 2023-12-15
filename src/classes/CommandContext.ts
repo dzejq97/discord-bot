@@ -45,7 +45,7 @@ export default class CommandContext {
         if (!this.arguments) return null;
         let str = "";
         for (const arg of this.arguments) {
-            str += arg.content;
+            str += " " + arg.content;
         }
         if (str.length > 0) return str;
         else return null;

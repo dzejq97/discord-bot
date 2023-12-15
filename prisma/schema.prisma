@@ -7,21 +7,20 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:./dev.db"
 }
 
 model User {
-  id String @unique
-  join_at DateTime @default(now())
-  money Int @default(0)
-  reputation Int @default(0)
-  experience Int @default(0)
-  level Int @default(0)
+  id         String   @unique
+  join_at    DateTime @default(now())
+  money      Int      @default(0)
+  reputation Int      @default(0)
+  experience Int      @default(0)
+  level      Int      @default(0)
 }
 
 model Guild {
-  id String @unique
-  join_at DateTime @default(now())
-  owner_id String 
-  mute_role_id String
+  id           String   @unique
+  join_at      DateTime @default(now())
+  owner_id     String 
 }

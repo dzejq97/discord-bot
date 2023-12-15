@@ -7,10 +7,10 @@ export const command: ICommand = {
         name: 'cfg_mod',
         aliases: ['configure_moderation'],
         description: 'Setting for moderation module',
-        requiredPermissions: [PermissionFlagsBits.Administrator],
+        required_permissions: [PermissionFlagsBits.Administrator],
     },
     async execute(context: CommandContext) {
         if (!context.message.member) return;
-        if (!this.meta.requiredPermissions || !context.message.member.permissions.has(this.meta.requiredPermissions[0])) return;
+        if (!this.meta.required_permissions || !context.message.member.permissions.has(this.meta.required_permissions[0])) return;
     }
 }
