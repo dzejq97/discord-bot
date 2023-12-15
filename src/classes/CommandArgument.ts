@@ -1,7 +1,8 @@
-import MainClient from "src/main_client";
+import MainClient from "src/classes/CustomClient";
 import { GuildBasedChannel, GuildMember, Message, Role } from "discord.js";
+import ms from 'ms';
 
-export default class ComandArgument {
+export default class CommandArgument {
     content: string;
     client: MainClient;
     message: Message;
@@ -17,13 +18,21 @@ export default class ComandArgument {
         return false;
     }
 
-    async getMember(): Promise<GuildMember | null> {
+    parseToTime(): number | null{
+        const time = ms(this.content);
+        if (typeof time === 'number') return time;
+        else return null;
+    }
+
+    async parseToMember(): Promise<GuildMember | null> {
         if (!this.isMemberMention() || !this.message.guild) return null;
 
         const member_id = this.content.substring(2, this.content.length - 1);
+        console.log(member_id);
 
         try {
-            return await this.message.guild.members.fetch(member_id);
+            const memb = await this.message.guild.members.fetch(member_id);
+            return memb;
         } catch (err) {
             console.log(err);
             return null;
@@ -35,7 +44,7 @@ export default class ComandArgument {
         return false;
     }
 
-    async getRole(): Promise<Role | null> {
+    async parseToRole(): Promise<Role | null> {
         if (!this.isRoleMention() || !this.message.guild) return null;
 
         const role_id = this.content.substring(3, this.content.length - 1)
@@ -55,7 +64,7 @@ export default class ComandArgument {
         return false;
     }
 
-    async getChannel(): Promise<GuildBasedChannel | null> {
+    async parseToChannel(): Promise<GuildBasedChannel | null> {
         if (!this.isChannelMention() || !this.message.guild) return null;
 
         const channel_id = this.content.substring(2, this.content.length - 1)

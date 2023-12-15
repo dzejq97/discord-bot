@@ -1,14 +1,16 @@
 import { Events, GuildMember } from 'discord.js';
-import MainClient from 'src/main_client';
+import CustomClient from 'src/classes/CustomClient';
+import { PrismaClient } from '@prisma/client';
 
 export = {
     name: Events.GuildMemberAdd,
     once: false,
 
-    async execute(client: MainClient, member: GuildMember) {
+    async execute(client: CustomClient, member: GuildMember) {
+        const prisma = new PrismaClient();
         try {
-            if (!await client.prisma.user.findUnique({where: { id: member.user.id}})) {
-                await client.prisma.user.create({
+            if (!await prisma.user.findUnique({where: { id: member.user.id}})) {
+                await prisma.user.create({
                     data: {
                         id: member.user.id,
                     }

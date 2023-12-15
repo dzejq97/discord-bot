@@ -1,33 +1,25 @@
-import { Client } from 'discord.js';
-import fs from 'node:fs';
-import path from 'node:path';
+import { Client } from "discord.js";
+import intents from "../dependencies/intents"
+import fs from "node:fs";
+import path from "node:path";
 
-import intents from './dependencies/intents';
+import CommandsManager from "./CommandsManager";
+import Logger from "./Logger";
+import EmbedsManager from "./EmbedsManager";
 
-import Logger from './classes/Logger';
-import CommandsManager from './classes/CommandsManager';
-import EmbedsManager from './classes/EmbedsManager';
-import { PrismaClient, User, Prisma } from "@prisma/client";
-
-
-
-export default class MainClient extends Client {
+export default class CustomClient extends Client {
+    commands: CommandsManager;
     logger: Logger = new Logger();
     embeds: EmbedsManager = new EmbedsManager();
-    commands_manager: CommandsManager;
-    prisma: PrismaClient = new PrismaClient();
-
-
-    constructor(){
+    constructor() {
         super(intents);
 
-        this.commands_manager = new CommandsManager(this);
+        this.commands = new CommandsManager(this);
     }
-    database_manager?: any; // Place for database manager
 
-    loadEvents() {
+    async init() {
         this.logger.info('Loading events:')
-        const eventsPath = path.join(__dirname, 'events');
+        const eventsPath = path.join(__dirname, '../events');
         const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.ts'));
         for (const file of eventFiles) {
             this.logger.info(`Loading: ${file}`)

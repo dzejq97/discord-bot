@@ -1,13 +1,15 @@
+import { PrismaClient } from '@prisma/client';
 import { Events, GuildMember } from 'discord.js';
-import MainClient from 'src/main_client';
+import CustomClient from 'src/classes/CustomClient';
 
 export = {
     name: Events.GuildMemberRemove,
     once: false,
 
-    async execute(client: MainClient, member: GuildMember) {
+    async execute(client: CustomClient, member: GuildMember) {
+        const prisma = new PrismaClient();
         try {
-            await client.prisma.user.delete({
+            await prisma.user.delete({
                 where: {
                     id: member.user.id,
                 }
