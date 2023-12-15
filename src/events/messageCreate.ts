@@ -12,5 +12,7 @@ export = {
             client.commands.seekForCommand(message);
             return;
         }
+
+        client.leveling.resolveMessageExp(message);
     }
 };

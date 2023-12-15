@@ -19,6 +19,8 @@ export = {
         } catch (error) {
             client.logger.error(`guild record not removed`);
             console.log(error);
+        } finally {
+            prisma.$disconnect();
         }
         return;
     }

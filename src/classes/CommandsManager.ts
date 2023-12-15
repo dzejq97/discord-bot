@@ -40,7 +40,6 @@ export default class CommandsManager {
             this.client.logger.success(`Loaded commands from ${category}`);
         }
         this.client.logger.success('All commands loaded.')
-        console.log(this.commands);
     } 
 
     hasPrefix(content: string) {
@@ -51,7 +50,6 @@ export default class CommandsManager {
     }
     
     seekForCommand(msg: Message) {
-        console.log('seeking');
         if (!msg.guild || msg.author.bot) return;
         const context = new CommandContext(this.client, this, msg);
 
@@ -70,27 +68,22 @@ export default class CommandsManager {
         }
 
         this.commands.forEach(category => {
-            //console.log(category);
             category.forEach(command => {
-                //console.log(command);
                 if (command.meta.name === commandName) {
                     context.used_alias = commandName;
                     command.execute(context);
-                    console.log('ex1');
                     return;
                 } else {
                     command.meta.aliases?.forEach(alias => {
                         if (alias === commandName) {
                             context.used_alias = commandName;
                             command.execute(context);
-                            console.log('ex2');
                             return;
                         }
                     })
                 }
             })
         })
-        return console.log('executing failed');
     }
 
 };

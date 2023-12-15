@@ -36,6 +36,8 @@ export = {
         } catch (error) {
             console.log(error);
             client.logger.error('Synchronizing failed');
+        } finally {
+            prisma.$disconnect();
         }
         client.logger.success('Synchronized');
 

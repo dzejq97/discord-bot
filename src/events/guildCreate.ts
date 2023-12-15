@@ -23,6 +23,8 @@ export = {
         } catch (error) {
             client.logger.error(`failed adding guild database record ${guild.name}:${guild.id}`);
             console.log(error);
+        } finally {
+            prisma.$disconnect();
         }
 
     }

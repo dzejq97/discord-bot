@@ -16,6 +16,8 @@ export = {
             });
         } catch (error) {
             console.log(error);
+        } finally {
+            prisma.$disconnect();
         }
         return;
     }
