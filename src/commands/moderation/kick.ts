@@ -7,11 +7,11 @@ export const command: ICommand = {
         name: 'kick',
         aliases: ['k'],
         description: 'Kick member',
-        requiredPermissions: [PermissionFlagsBits.KickMembers],
+        required_permissions: [PermissionFlagsBits.KickMembers],
     },
     async execute(context: CommandContext) {
         if (!context.message.member) return;
-        if (!this.meta.requiredPermissions || !context.message.member.permissions.has(this.meta.requiredPermissions))
+        if (!this.meta.required_permissions || !context.message.member.permissions.has(this.meta.required_permissions))
             return;
         if (!context.arguments || !context.arguments[0].isMemberMention())
             return context.message.reply({embeds: [context.client.embeds.info('Use !kick [user] <reason>')]});

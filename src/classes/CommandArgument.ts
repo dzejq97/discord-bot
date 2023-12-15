@@ -1,5 +1,6 @@
 import MainClient from "src/classes/CustomClient";
 import { GuildBasedChannel, GuildMember, Message, Role } from "discord.js";
+import ms from 'ms';
 
 export default class CommandArgument {
     content: string;
@@ -15,6 +16,12 @@ export default class CommandArgument {
     isMemberMention(): boolean {
         if (this.content.startsWith("<@") && this.content.endsWith(">")) return true;
         return false;
+    }
+
+    parseToTime(): number | null{
+        const time = ms(this.content);
+        if (typeof time === 'number') return time;
+        else return null;
     }
 
     async parseToMember(): Promise<GuildMember | null> {

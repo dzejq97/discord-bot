@@ -5,11 +5,11 @@ export interface ICommand {
     meta: {
         name: string,
         aliases?: string[],
-        requiredPermissions?: bigint[],
+        required_permissions?: bigint[],
         description?: string,
+        proper_usage?: string;
         category?: string,
         delete_message_on_trigger?: boolean;
-        arguments_format?: string;
     },
     execute(context: CommandContext):void;
 }

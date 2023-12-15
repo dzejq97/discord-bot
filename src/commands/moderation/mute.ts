@@ -7,13 +7,13 @@ export const command: ICommand = {
     meta: {
         name: "mute",
         aliases: ["m"],
-        requiredPermissions: [PermissionFlagsBits.BanMembers],
-        arguments_format: "",
+        required_permissions: [PermissionFlagsBits.BanMembers],
+        proper_usage: "!mute <member> <time> [reason]",
     },
 
     async execute(context: CommandContext) {
         if (!context.message.member) return;
-        if (!this.meta.requiredPermissions || !context.message.member.permissions.has(this.meta.requiredPermissions))
+        if (!this.meta.required_permissions || !context.message.member.permissions.has(this.meta.required_permissions))
             return;
         if (!context.arguments || !context.arguments[0].isMemberMention())
             return context.message.reply({embeds: [context.client.embeds.info('Use !mute <user> [reason]')]});

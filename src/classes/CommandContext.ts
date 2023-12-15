@@ -1,36 +1,7 @@
 import MainClient from "src/classes/CustomClient";
 import CommandsManager from "./CommandsManager";
 import ComandArgument from "./CommandArgument";
-import { Message, User, GuildMember, Guild, Collection} from "discord.js";
-import ms from 'ms';
-
-enum EArgsFormats {
-    single_string = "single_string",
-    multi_string = "multi_string",
-    number = "number",
-    member = "member",
-    user = "user",
-    role = "role",
-    channel = "channel",
-    time = "time"
-}
-
-const usableTypes: string[] = [
-    "single_string",
-    "multi_string",
-    "number",
-    "member",
-    "user",
-    "role",
-    "channel",
-    "time",
-]
-
-interface IParserElement {
-    index: number;
-    type?: string;
-    optional?: boolean;
-}
+import { Message, User, GuildMember, Guild, Collection, PermissionFlagsBits} from "discord.js";
 
 export default class CommandContext {
     client: MainClient;
@@ -46,46 +17,37 @@ export default class CommandContext {
         this.message = message;
     }
 
+    async executionFailed(msg: string, proper_usage?: string): Promise<void> {
+        const emb = this.client.embeds.empty();
+        emb.setTitle(msg);
+        if (proper_usage && proper_usage.length > 0) emb.setDescription('Use `'+ proper_usage + '`');
+
+        await this.message.reply({embeds: [emb]});
+    }
+
     verifyAuthorPermissions(permissions: bigint[] | undefined): boolean {
         if (!permissions) return false;
         if (this.message.member?.permissions.has(permissions)) return true;
         else return false;
     }
 
-    async parseArguments(format: string | undefined) {
-        if(!format || !this.arguments) return false;
+    verifyTargetPermissions(targetMember: GuildMember): boolean {
+        if (targetMember.permissions.has([
+            PermissionFlagsBits.Administrator,
+            PermissionFlagsBits.BanMembers,
+            PermissionFlagsBits.KickMembers,
+            PermissionFlagsBits.MuteMembers,
+        ])) return false;
+        return true;
+    }
 
-        const ArgumentsTypes: IParserElement[] = [];
-        let lastIsMultiString: boolean = false;
-
-        let i = 0;
-        for (let str of format.split(' ')) {
-            if (lastIsMultiString) break;
-
-            const el: IParserElement = {
-                index: i,
-            };
-
-            if (str.startsWith('<') && str.endsWith('>')) el.optional = false;
-            else if (str.startsWith('[') && str.endsWith(']')) el.optional = true;
-            else return false;
-
-            const typeName = str.substring(1, str.length - 1);
-            if (usableTypes.includes(typeName)) {
-                el.type = typeName;
-                if (el.type === 'multi_string') lastIsMultiString = true;
-            } else return false;
-
-            ArgumentsTypes.push(el);
-            i++;
-        }
-
-        // Too much arguments without <multi_string> at end of format
-        if (!lastIsMultiString && this.arguments.length > ArgumentsTypes.length) return false;
-
-        i = 0;
+    joinArguments(): string | null {
+        if (!this.arguments) return null;
+        let str = "";
         for (const arg of this.arguments) {
-
+            str += arg.content;
         }
+        if (str.length > 0) return str;
+        else return null;
     }
 }
