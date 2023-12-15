@@ -1,19 +1,23 @@
-# W I P Discord Bot
-Made with Node.js, Discord.js and TypeScript
+# AIO Ubojnia Discord Bot
+Made with Node.js, Discord.js, Prisma and TypeScript
 
 ## Features
-- None :)
+### Moderation system
+- !mute
+- !unmute
+- !kick
+- !ban
+### Leveling (on the way)
+
+## Installation
+Clone repository:
+
 
 ## TO DO:
-- Commands handling
-- Database handling
-- Users and Guilds handling
-
-- Moderation
-- Economy
-- Role-Reactions/Verifications
-- Tickets
-- Leveling
+- [ ] Economy
+- [ ] Role-Reactions/Verifications
+- [ ] Tickets
+- [ ] Leveling
 - and much more...
 
 Detailed TODO's in GitHub issues
