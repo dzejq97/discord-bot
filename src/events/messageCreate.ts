@@ -6,14 +6,11 @@ export = {
     once: false,
 
     async execute(client: MainClient, message: Message) {
-        if (message.author.bot || !message.guild) return
+        if (message.author.bot || !message.guild) return;
 
         if (client.commands.hasPrefix(message.content)) {
             client.commands.seekForCommand(message);
             return;
         }
-
-        //if (client.commands.seekForCommand(message)) return console.log('executed');
-        //else console.log('not executed');
     }
 };

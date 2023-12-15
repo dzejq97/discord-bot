@@ -12,7 +12,7 @@ export const command: ICommand = {
     },
 
     async execute(context: CommandContext) {
-        try {
+            console.log('mute executed');
             if (!context.verifyAuthorPermissions(this.meta.required_permissions))
                 return await context.executionFailed('You have no permissions');
 
@@ -34,9 +34,5 @@ export const command: ICommand = {
 
             await context.message.channel.send({embeds: [emb]});
             return await targetMember.timeout(time);
-            
-        } catch (error) {
-            return context.client.logger.error(String(error));
-        }
     }
 }

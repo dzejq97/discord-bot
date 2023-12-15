@@ -6,15 +6,18 @@ import path from "node:path";
 import CommandsManager from "./CommandsManager";
 import Logger from "./Logger";
 import EmbedsManager from "./EmbedsManager";
+import LevelingManager from "./LevelingManager";
 
 export default class CustomClient extends Client {
     commands: CommandsManager;
     logger: Logger = new Logger();
     embeds: EmbedsManager = new EmbedsManager();
+    leveling: LevelingManager;
     constructor() {
         super(intents);
 
         this.commands = new CommandsManager(this);
+        this.leveling = new LevelingManager(this);
     }
 
     async init() {
