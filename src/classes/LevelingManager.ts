@@ -12,12 +12,10 @@ interface ILevelingUpdateCache {
 
 export default class LevelingManager {
     client: CustomClient;
-    //prisma: PrismaClient;
     update_cache: Collection<string, ILevelingUpdateCache> = new Collection();
 
     constructor(client: CustomClient) {
         this.client = client;
-        //this.prisma = new PrismaClient();
 
         setTimeout(async () => await this.db_update(), ms(db_LevelUpdateTimeout));
     }
@@ -45,8 +43,6 @@ export default class LevelingManager {
     }
 
     resolveMessageExp(msg: Message) {
-        if (msg.author.bot) return;
-
         let userUpdate: ILevelingUpdateCache | undefined;
 
         if (!this.update_cache.has(msg.author.id)) {
