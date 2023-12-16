@@ -1,6 +1,5 @@
 import { Events } from 'discord.js';
 import CustomClient from 'src/classes/CustomClient';
-import { PrismaClient } from "@prisma/client"
 
 export = {
     name: Events.ClientReady,
@@ -10,34 +9,31 @@ export = {
         client.logger.success(`Client ready! Logged in as ${client.user?.tag}`);
 
         client.logger.info("Synchronizing database");
-        const prisma = new PrismaClient();
         try {
             (await client.guilds.fetch()).forEach(async OAGuild => {
                 const guild = await OAGuild.fetch();
-                if (!await prisma.guild.findFirst({where: {guild_id: guild.id}})) {
-                    await prisma.guild.create({
+                if (!await client.prisma.guild.findFirst({where: {id: guild.id}})) {
+                    await client.prisma.guild.create({
                         data: {
-                            guild_id: guild.id,
+                            id: guild.id,
                             owner_id: guild.ownerId,
                         }
                     })
                 }
     
                 (await guild.members.fetch()).forEach(async (member) => {
-                    if (!await prisma.user.findFirst({where: {user_id: member.user.id}}) || member.user.bot) {
-                        await prisma.user.create({
+                    if (!await client.prisma.user.findFirst({where: {id: member.user.id}})) {
+                        await client.prisma.user.create({
                             data: {
-                                user_id: member.user.id,
+                                id: member.user.id,
                             }
                         })
                     }
                 })
             })
         } catch (error) {
-            console.log(error);
+            client.logger.error(String(error));
             client.logger.error('Synchronizing failed');
-        } finally {
-            prisma.$disconnect();
         }
         client.logger.success('Synchronized');
 

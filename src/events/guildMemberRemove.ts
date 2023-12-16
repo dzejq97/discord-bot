@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import { Events, GuildMember } from 'discord.js';
 import CustomClient from 'src/classes/CustomClient';
 

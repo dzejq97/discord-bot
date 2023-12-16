@@ -1,6 +1,5 @@
 import { Events, Guild } from 'discord.js';
 import CustomClient from 'src/classes/CustomClient';
-import { PrismaClient } from '@prisma/client';
 
 export = {
     name: Events.GuildCreate,
@@ -8,12 +7,11 @@ export = {
 
     async execute(client: CustomClient, guild: Guild) {
         client.logger.info(`guild joined ${guild.name}:${guild.id}`);
-        const prisma = new PrismaClient();
         try {
-            if (!await prisma.guild.findUnique({where: { id: guild.id}})) {
-                await prisma.guild.create({
+            if (!await client.prisma.guild.findFirst({where: { id: guild.id}})) {
+                await client.prisma.guild.create({
                     data: {
-                        guild_id: guild.id,
+                        id: guild.id,
                         owner_id: guild.ownerId,
                     }
                 })
@@ -23,8 +21,6 @@ export = {
         } catch (error) {
             client.logger.error(`failed adding guild database record ${guild.name}:${guild.id}`);
             console.log(error);
-        } finally {
-            prisma.$disconnect();
         }
 
     }

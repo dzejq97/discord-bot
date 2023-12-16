@@ -1,4 +1,5 @@
 import { Client } from "discord.js";
+import { PrismaClient } from "@prisma/client";
 import intents from "../dependencies/intents"
 import fs from "node:fs";
 import path from "node:path";
@@ -13,6 +14,8 @@ export default class CustomClient extends Client {
     logger: Logger = new Logger();
     embeds: EmbedsManager = new EmbedsManager();
     leveling: LevelingManager;
+    prisma: PrismaClient = new PrismaClient();
+
     constructor() {
         super(intents);
 

@@ -23,14 +23,13 @@ export default class LevelingManager {
     }
     async db_update() {
         let count = 0;
-        const prisma = new PrismaClient();
 
         this.update_cache.forEach(async (userUpdate, user_id) => {
             count++;
 
             try {
-                await prisma.user.update({
-                    where: { id: user_id },
+                await this.client.prisma.user.update({
+                    where: { id: user_id},
                     data: {
                     experience: { increment: userUpdate.experience_increment }}});
             } catch (error) {
@@ -46,6 +45,8 @@ export default class LevelingManager {
     }
 
     resolveMessageExp(msg: Message) {
+        if (msg.author.bot) return;
+
         let userUpdate: ILevelingUpdateCache | undefined;
 
         if (!this.update_cache.has(msg.author.id)) {
