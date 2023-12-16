@@ -14,20 +14,20 @@ export = {
         try {
             (await client.guilds.fetch()).forEach(async OAGuild => {
                 const guild = await OAGuild.fetch();
-                if (!await prisma.guild.findUnique({where: {id: guild.id}})) {
+                if (!await prisma.guild.findFirst({where: {guild_id: guild.id}})) {
                     await prisma.guild.create({
                         data: {
-                            id: guild.id,
+                            guild_id: guild.id,
                             owner_id: guild.ownerId,
                         }
                     })
                 }
     
                 (await guild.members.fetch()).forEach(async (member) => {
-                    if (!await prisma.user.findUnique({where: {id: member.user.id}} || member.user.bot)) {
+                    if (!await prisma.user.findFirst({where: {user_id: member.user.id}}) || member.user.bot) {
                         await prisma.user.create({
                             data: {
-                                id: member.user.id,
+                                user_id: member.user.id,
                             }
                         })
                     }

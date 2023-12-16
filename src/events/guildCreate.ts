@@ -13,7 +13,7 @@ export = {
             if (!await prisma.guild.findUnique({where: { id: guild.id}})) {
                 await prisma.guild.create({
                     data: {
-                        id: guild.id,
+                        guild_id: guild.id,
                         owner_id: guild.ownerId,
                     }
                 })

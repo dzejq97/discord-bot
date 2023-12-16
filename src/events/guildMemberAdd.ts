@@ -12,7 +12,7 @@ export = {
             if (!await prisma.user.findUnique({where: { id: member.user.id}})) {
                 await prisma.user.create({
                     data: {
-                        id: member.user.id,
+                        user_id: member.user.id,
                     }
                 })
             }
