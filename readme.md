@@ -18,6 +18,7 @@ Made with Node.js, Discord.js, Prisma and TypeScript
 
 3. Configuration:
 > Edit and rename `template.config.json` to `config.json` at `./src`.
+
 > Edit and rename `template.env` to `.env` at `./`
 
 4. Generate Prisma Client:
