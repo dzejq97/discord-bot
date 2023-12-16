@@ -12,7 +12,10 @@ export = {
             client.commands.seekForCommand(message);
             return;
         }
-
-        client.leveling.resolveMessageExp(message);
+        try {
+            await client.leveling.resolveExperience(message);
+        } catch (error) {
+            return client.logger.error(String(error));
+        }
     }
 };
