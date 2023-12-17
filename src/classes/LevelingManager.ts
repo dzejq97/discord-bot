@@ -1,5 +1,5 @@
 import CustomClient from "./CustomClient";
-import { db_LevelUpdateTimeout, Exp_per_message } from "../config.json";
+import { db_LevelUpdateTimeout, Exp_per_message,Exp_for_third_level, Exp_for_second_level } from "../config.json";
 import { Collection, Message } from "discord.js";
 import ms from "ms";
 import { User } from "@prisma/client"
@@ -23,6 +23,8 @@ export default class LevelingManager {
                     where: { id: id },
                     data: {
                         experience: user.experience,
+                        level: user.level,
+                        next_level_exp: user.next_level_exp,
                     }
                 });
             } catch (error) {
@@ -47,9 +49,22 @@ export default class LevelingManager {
                 return this.client.logger.error(String(error));
             }
         }
-        if (!user || !user.experience) return;
+
+        if (!user ||
+            !user.experience ||
+            !user.next_level_exp ||
+            !user.level) return;
 
         user.experience += Exp_per_message;
+
+        if (user.experience >= user.next_level_exp) {
+            user.level++;
+            const exp_left = user.experience - user.next_level_exp;
+            user.experience = exp_left;
+
+            const step = Exp_for_third_level - Exp_for_second_level;
+            const next_exp = (user.level * step) * step
+        }
 
         this.update_cache.set(msg.author.id, user);
     }
