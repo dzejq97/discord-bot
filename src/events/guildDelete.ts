@@ -1,6 +1,5 @@
 import { Events, Guild } from 'discord.js';
 import CustomClient from 'src/classes/CustomClient';
-import { PrismaClient } from '@prisma/client';
 
 export = {
     name: Events.GuildDelete,
@@ -8,17 +7,15 @@ export = {
 
     async execute(client: CustomClient, guild: Guild) {
         client.logger.info(`guild left ${guild.name}:${guild.id}`);
-        const prisma = new PrismaClient();
         try {
-            await prisma.guild.delete({
+            await client.prisma.guild.delete({
                 where: {
                     id: guild.id,
                 }
             });
-            client.logger.info(`guild record removed`);
+            client.logger.info(`DB: guild record removed`);
         } catch (error) {
-            client.logger.error(`guild record not removed`);
-            console.log(error);
+            return console.log(String(error));
         }
         return;
     }

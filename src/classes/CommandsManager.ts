@@ -1,5 +1,5 @@
 import { Prefixes } from "../config.json";
-import CustomClient from "src/classes/CustomClient";
+import CustomClient from "./CustomClient";
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -27,14 +27,15 @@ export default class CommandsManager {
             const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.ts'));
             // Format category name
             let categoryName = category.replace('_', ' ');
-            categoryName = `${categoryName.charAt(0).toUpperCase()}${categoryName.substring(1)}`
+            categoryName = `${categoryName.charAt(0).toUpperCase()}${categoryName.substring(1)}`;
+            if (!this.commands.get(categoryName)) this.commands.set(categoryName, new Collection<string, ICommand>());
 
             for ( const file of commandsFiles) {
                 this.client.logger.info(`Loading ${file} command.`)
                 const filePath = path.join(commandsPath, file);
                 const command: ICommand = require(filePath).command;
                 command.meta.category = categoryName;
-                this.commands.set(command.meta.category, new Collection<string, ICommand>().set(command.meta.name, command))
+                this.commands.get(command.meta.category)?.set(command.meta.name, command);
             }
             this.client.logger.success(`Loaded commands from ${category}`);
         }
@@ -50,7 +51,6 @@ export default class CommandsManager {
     
     seekForCommand(msg: Message) {
         if (!msg.guild || msg.author.bot) return;
-        
         const context = new CommandContext(this.client, this, msg);
 
         for (const prefix of this.prefixes) {
@@ -84,7 +84,6 @@ export default class CommandsManager {
                 }
             })
         })
-        return;
     }
 
 };

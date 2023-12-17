@@ -10,18 +10,27 @@ Made with Node.js, Discord.js, Prisma and TypeScript
 ### Leveling (on the way)
 
 ## Installation
-- Clone repository:
+1. Clone repository:
 > `git clone https://github.com/dzejq97/discord-bot.git`
 
-- Install dependencies:
+2. Install dependencies:
 > `npm i`
 
-- Edit and rename `template.config.json` to `config.json`
+3. Configuration:
+> Edit and rename `template.config.json` to `config.json` at `./src`.
 
-- Run in development:
+> Edit and rename `template.env` to `.env` at `./`
+
+4. Generate Prisma Client:
+> `npx prisma generate`
+
+5. Create database structure:
+> `npx prisma db push`
+
+6. Run in development:
 > `npm start`
 
-- Build to JS:
+7. Build to JS:
 > `npm build`
 
 

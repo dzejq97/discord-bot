@@ -4,6 +4,6 @@ package-lock.json
 debug.log
 src/config.json
 
-*.env
+.env
 /prisma/*.db
 /prisma/*.db-journal

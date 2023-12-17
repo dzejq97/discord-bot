@@ -1,4 +1,6 @@
 {
-    "Token": "",
-    "Prefixes": ["!", "?"]
+    "Token": "TOKEN.HERE",
+    "Prefixes": ["!", "?"],
+    "db_LevelUpdateTimeout": "15s",
+    "Exp_per_message": 2
 }

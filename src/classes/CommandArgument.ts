@@ -28,7 +28,6 @@ export default class CommandArgument {
         if (!this.isMemberMention() || !this.message.guild) return null;
 
         const member_id = this.content.substring(2, this.content.length - 1);
-        console.log(member_id);
 
         try {
             const memb = await this.message.guild.members.fetch(member_id);

@@ -1,18 +1,18 @@
 import { Events, GuildMember } from 'discord.js';
 import CustomClient from 'src/classes/CustomClient';
-import { PrismaClient } from '@prisma/client';
+import {XpStep} from "../config.json"
 
 export = {
     name: Events.GuildMemberAdd,
     once: false,
 
     async execute(client: CustomClient, member: GuildMember) {
-        const prisma = new PrismaClient();
         try {
-            if (!await prisma.user.findUnique({where: { id: member.user.id}})) {
-                await prisma.user.create({
+            if (!await client.prisma.user.findUnique({where: { id: member.user.id}})) {
+                await client.prisma.user.create({
                     data: {
                         id: member.user.id,
+                        req_xp: XpStep
                     }
                 })
             }
