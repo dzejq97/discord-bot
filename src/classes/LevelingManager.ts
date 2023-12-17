@@ -17,11 +17,7 @@ export default class LevelingManager {
 
     async pushAllCacheUpdates() {
         this.update_cache.forEach(async (user, id) => {
-            try {
-                await this.updateUserCache(user);
-            } catch (error) {
-                return this.client.logger.error(String(error));
-            }
+            await this.updateUserCache(user);
         });
 
         setTimeout(async () => await this.pushAllCacheUpdates(), ms(db_LevelUpdateTimeout));
@@ -64,10 +60,10 @@ export default class LevelingManager {
         }
 
         if (!user ||
-            !user.experience ||
-            !user.next_level_exp ||
-            !user.level) return;
-
+            user.experience == null ||
+            user.next_level_exp == null ||
+            user.level == null) return;
+        
         user.experience += XpPerMessage;
 
         if (user.experience >= user.next_level_exp) {
