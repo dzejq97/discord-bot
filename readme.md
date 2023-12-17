@@ -7,7 +7,14 @@ Made with Node.js, Discord.js, Prisma and TypeScript
 - !unmute
 - !kick
 - !ban
-### Leveling (on the way)
+### Leveling and reputation(not finished)
+- Leveling working but not finished
+- Reputation points finished.
+> Detects message replies and mentions, and triggered by message contents `+rep`, `-rep`, `+1`, `-1`.
+> Example:
+>> `+1 @mention`
+>> or
+>> `+1` as message reply
 
 ## Installation
 1. Clone repository:
