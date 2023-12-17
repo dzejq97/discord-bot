@@ -1,6 +1,6 @@
 import { Events } from 'discord.js';
 import CustomClient from 'src/classes/CustomClient';
-import {Exp_for_second_level} from "../config.json"
+import {XpStep} from "../config.json"
 
 export = {
     name: Events.ClientReady,
@@ -27,7 +27,7 @@ export = {
                         await client.prisma.user.create({
                             data: {
                                 id: member.user.id,
-                                next_level_exp: Exp_for_second_level
+                                next_level_exp: XpStep,
                             }
                         })
                     }
