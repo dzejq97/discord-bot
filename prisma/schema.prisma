@@ -15,9 +15,9 @@ model User {
   join_at    DateTime @default(now())
   money      Int?     @default(0)
   reputation Int?     @default(0)
-  experience Int?     @default(0)
+  xp Int?     @default(0)
   level      Int?     @default(1)
-  next_level_exp Int?
+  req_xp Int?
 }
 
 model Guild {

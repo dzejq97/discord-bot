@@ -1,5 +1,5 @@
 import CustomClient from "./CustomClient";
-import { db_LevelUpdateTimeout, XpMultiply, XpPerMessage, XpStep } from "../config.json";
+import { DB_XpUpdateTimeout, XpMultiply, XpPerMessage, XpStep } from "../config.json";
 import { Collection, Message } from "discord.js";
 import ms from "ms";
 import { User } from "@prisma/client"
@@ -12,25 +12,25 @@ export default class LevelingManager {
     constructor(client: CustomClient) {
         this.client = client;
 
-        setTimeout(async () => await this.pushAllCacheUpdates(), ms(db_LevelUpdateTimeout));
+        setTimeout(async () => await this.DBPushUpdates(), ms(DB_XpUpdateTimeout));
     }
 
-    async pushAllCacheUpdates() {
+    async DBPushUpdates() {
         this.update_cache.forEach(async (user, id) => {
-            await this.updateUserCache(user);
+            await this.updateUser(user);
         });
 
-        setTimeout(async () => await this.pushAllCacheUpdates(), ms(db_LevelUpdateTimeout));
+        setTimeout(async () => await this.DBPushUpdates(), ms(DB_XpUpdateTimeout));
     }
 
-    async updateUserCache(user: User) {
+    async updateUser(user: User) {
         try {
             await this.client.prisma.user.update({
                 where: { id: user.id},
                 data: {
-                    experience: user.experience,
+                    xp: user.xp,
                     level: user.level,
-                    next_level_exp: user.next_level_exp,
+                    req_xp: user.req_xp,
                 }
             });
         } catch (error) {
@@ -41,8 +41,8 @@ export default class LevelingManager {
     }
 
     calculateNextLevelExp(currentLevel: number): number {
-        const next_level_experience = XpStep * XpPerMessage * (XpMultiply * currentLevel);
-        return next_level_experience;
+        const next_level_xp = XpStep * XpPerMessage * (XpMultiply * currentLevel);
+        return next_level_xp;
 
     }
 
@@ -60,24 +60,24 @@ export default class LevelingManager {
         }
 
         if (!user ||
-            user.experience == null ||
-            user.next_level_exp == null ||
+            user.xp == null ||
+            user.req_xp == null ||
             user.level == null) return;
         
-        user.experience += XpPerMessage;
+        user.xp += XpPerMessage;
 
-        if (user.experience >= user.next_level_exp) {
+        if (user.xp >= user.req_xp) {
             user.level++;
-            const exp_left = user.experience - user.next_level_exp;
-            user.experience = exp_left;
-            user.next_level_exp = this.calculateNextLevelExp(user.level);
+            const xp_left = user.xp - user.req_xp;
+            user.xp = xp_left;
+            user.req_xp = this.calculateNextLevelExp(user.level);
 
             const emb = this.client.embeds.empty();
             emb.setTitle(`${msg.author.username} advanced from level ${user.level - 1} to level ${user.level}!`);
             
             try {
                 await msg.channel.send({embeds: [emb]});
-                await this.updateUserCache(user);
+                await this.updateUser(user);
             } catch (error) {
                 return this.client.logger.error(String(error));
             } finally {
