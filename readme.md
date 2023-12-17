@@ -12,9 +12,9 @@ Made with Node.js, Discord.js, Prisma and TypeScript
 - Reputation points finished.
 > Detects message replies and mentions, and triggered by message contents `+rep`, `-rep`, `+1`, `-1`.
 > Example:
->> `+1 @mention`
->> or
->> `+1` as message reply
+> `+1 @mention`
+> or
+> `+1` as message reply
 
 ## Installation
 1. Clone repository:
