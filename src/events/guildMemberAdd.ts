@@ -12,7 +12,7 @@ export = {
                 await client.prisma.user.create({
                     data: {
                         id: member.user.id,
-                        next_level_exp: XpStep
+                        req_xp: XpStep
                     }
                 })
             }
