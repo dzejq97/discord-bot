@@ -10,10 +10,10 @@ Made with Node.js, Discord.js, Prisma and TypeScript
 ### Leveling and reputation(not finished)
 - Leveling working but not finished
 - Reputation points finished.
-> Detects message replies and mentions, and triggered by message contents `+rep`, `-rep`, `+1`, `-1`.
-> Example:
+Detects message replies and mentions, and triggered by message contents `+rep`, `-rep`, `+1`, `-1`.
+Example:
 > `+1 @mention`
-> or
+or
 > `+1` as message reply
 
 ## Installation
