@@ -25,13 +25,15 @@ export = {
         if (message.content.startsWith('+rep') ||
             message.content.startsWith('-rep') ||
             message.content.startsWith('+1') || 
-            message.content.startsWith('-1') ) {
+            message.content.startsWith('-1')) {
+                if (client.cooldowns.active.find(c=> c.name === "TO_reputation")) return;
                 const first_char = message.content.charAt(0);
                 let target: any = message.mentions.repliedUser;
                 if (!target) {
                     target = message.mentions.members?.first();
                     if (!target) return;
                 }
+                client.cooldowns.setCooldown(message.author.id, "TO_reputation", "30m");
 
                 try {
                     if (first_char === '+') {

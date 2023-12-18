@@ -2,6 +2,7 @@ import MainClient from "src/classes/CustomClient";
 import CommandsManager from "./CommandsManager";
 import ComandArgument from "./CommandArgument";
 import { Message, User, GuildMember, Guild, Collection, PermissionFlagsBits} from "discord.js";
+import { ICommand } from "src/interfaces/ICommand";
 
 export default class CommandContext {
     client: MainClient;
@@ -23,6 +24,19 @@ export default class CommandContext {
         if (proper_usage && proper_usage.length > 0) emb.setDescription('Use `'+ proper_usage + '`');
 
         await this.message.reply({embeds: [emb]});
+    }
+
+    cooldown(command:ICommand): boolean {
+        const cooldown = this.client.cooldowns.active.find(cool => cool.name === command.meta.cooldown?.name);
+        if (!cooldown && command.meta.cooldown) {
+            this.client.cooldowns.setCooldown(
+                this.message.author.id,
+                command.meta.cooldown?.name,
+                command.meta.cooldown?.time
+            )
+            return false;
+        }
+        else return true;
     }
 
     verifyAuthorPermissions(permissions: bigint[] | undefined): boolean {

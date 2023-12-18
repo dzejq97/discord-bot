@@ -33,7 +33,7 @@ export = {
                     }
                 })
             })
-            await client.timeouts.loadTimeouts();
+            await client.cooldowns.initLoadCooldowns();
         } catch (error) {
             client.logger.error(String(error));
             client.logger.error('Synchronizing failed');
