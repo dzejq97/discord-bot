@@ -28,7 +28,7 @@ export default class CooldownManager {
         }
     }
 
-    async setCooldown(user_id: string, name: string, time: number | string) {
+    async setCooldown(user_id: string, name: string, time: number | string): Promise<Cooldown | undefined> {
         let cooldown_time;
         if (typeof time === 'string') cooldown_time = ms(time);
         else cooldown_time = time;
@@ -40,9 +40,10 @@ export default class CooldownManager {
             }});
             this.active.set(user_id, cooldown);
             setTimeout(async () => await this.clearCooldown(user_id, name), cooldown.time);
-            return;
+            return cooldown;
         } catch (error) {
-            return this.client.logger.error(String(error));
+            this.client.logger.error(String(error));
+            return undefined;
         }
     }
 

@@ -17,6 +17,7 @@ export interface ICommand {
 interface ICooldown {
     name: string,
     time: string,
+    feedback_message?: boolean;
 }
 
 
