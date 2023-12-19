@@ -8,6 +8,7 @@ import CommandsManager from "./CommandsManager";
 import Logger from "./Logger";
 import EmbedsManager from "./EmbedsManager";
 import LevelingManager from "./LevelingManager";
+import CooldownManager from "./CooldownManager";
 
 export default class CustomClient extends Client {
     commands: CommandsManager;
@@ -15,12 +16,14 @@ export default class CustomClient extends Client {
     embeds: EmbedsManager = new EmbedsManager();
     leveling: LevelingManager;
     prisma: PrismaClient = new PrismaClient();
+    cooldowns: CooldownManager;
 
     constructor() {
         super(intents);
 
         this.commands = new CommandsManager(this);
         this.leveling = new LevelingManager(this);
+        this.cooldowns = new CooldownManager(this);
     }
 
     async init() {
