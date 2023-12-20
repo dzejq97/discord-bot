@@ -13,16 +13,20 @@ datasource db {
 model User {
   id         String       @id @map("_id")
   join_at    DateTime     @default(now())
-  money      Int?         @default(0)
-  reputation Int?         @default(0)
-  xp         Int?         @default(0)
-  req_xp     Int?
-  level      Int?         @default(1)
-  timeouts   Cooldown[]
+  guilds Guild[] @relation(fields: [guilds_ids], references: [id])
+  guilds_ids String[]
+  money      Int         @default(0)
+  reputation Int         @default(0)
+  xp         Int         @default(0)
+  req_xp     Int
+  level      Int         @default(1)
+  cooldowns   Cooldown[]
 }
 
 model Guild {
   id       String   @id @map("_id")
+  users User[] @relation(fields: [users_ids], references: [id])
+  users_ids String[]
   join_at  DateTime @default(now())
   owner_id String   @unique
 }

@@ -2,6 +2,10 @@ import { Events } from 'discord.js';
 import CustomClient from 'src/classes/CustomClient';
 import {XpStep} from "../config.json"
 
+import * as Canvas from "@napi-rs/canvas";
+import { promises } from 'fs';
+import { join } from 'path';
+
 export = {
     name: Events.ClientReady,
     once: true,
@@ -39,7 +43,7 @@ export = {
             client.logger.error('Synchronizing failed');
         }
         client.logger.success('Synchronized');
-
+////////////////////////////////////////
 
     }
 };

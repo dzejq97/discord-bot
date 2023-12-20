@@ -6,7 +6,6 @@
 import CustomClient from "./classes/CustomClient";
 import { Token } from './config.json'
 
-
 const client = new CustomClient();
 client.init();
 
