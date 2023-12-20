@@ -8,11 +8,7 @@ export = {
     async execute(client: CustomClient, guild: Guild) {
         client.logger.info(`guild left ${guild.name}:${guild.id}`);
         try {
-            await client.prisma.guild.delete({
-                where: {
-                    id: guild.id,
-                }
-            });
+            await client.prisma.guild.delete({ where: { id: guild.id }});
             client.logger.info(`DB: guild record removed`);
         } catch (error) {
             return console.log(String(error));
