@@ -6,6 +6,13 @@ export = {
     once: false,
 
     async execute(client: CustomClient, member: GuildMember) {
+        try {
+            if (await client.prisma.user.findFirst({ where: { id: member.id }})) {
+                await client.prisma.user.delete({ where: { id: member.id }});
+            }
+        } catch (error) {
+
+        }
         return;
     }
 };

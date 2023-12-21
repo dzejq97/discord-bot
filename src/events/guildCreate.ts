@@ -1,5 +1,6 @@
 import { Events, Guild } from 'discord.js';
 import CustomClient from 'src/classes/CustomClient';
+import { XpStep } from '../config.json';
 
 export = {
     name: Events.GuildCreate,
@@ -16,6 +17,26 @@ export = {
                     }
                 })
             }
+
+            (await guild.members.fetch()).forEach(async (member) => {
+                if (!await client.prisma.user.findFirst({where: { id: member.id }})) {
+                    await client.prisma.user.create({
+                        data: {
+                            id: member.id,
+                            req_xp: XpStep,
+                            guilds: { connect: { id: guild.id }}
+                        }
+                    })
+                } else {
+                    await client.prisma.user.update({
+                        where: {id: member.id},
+                        data: {
+                            guilds: { connect: {id: guild.id}}
+                        }
+                    })
+                }
+            })
+            
 
             client.logger.info(`database added ${guild.name}:${guild.id}`);
         } catch (error) {

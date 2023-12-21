@@ -1,6 +1,8 @@
 {
-    "Token": "TOKEN.HERE",
     "Prefixes": ["!", "?"],
-    "db_LevelUpdateTimeout": "15s",
-    "Exp_per_message": 2
+
+    "DB_XpUpdateTimeout": "5s",
+    "XpPerMessage": 2,
+    "XpStep": 10,
+    "XpMultiply": 1.115
 }

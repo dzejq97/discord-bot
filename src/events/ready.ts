@@ -12,7 +12,9 @@ export = {
         client.logger.info("Synchronizing database");
         try {
             (await client.guilds.fetch()).forEach(async OAGuild => {
+
                 const guild = await OAGuild.fetch();
+
                 if (!await client.prisma.guild.findFirst({where: {id: guild.id}})) {
                     await client.prisma.guild.create({
                         data: {
@@ -28,8 +30,9 @@ export = {
                             data: {
                                 id: member.user.id,
                                 req_xp: XpStep,
-                            }
-                        })
+                                guilds: { connect: { id: guild.id }},
+                            },
+                        });
                     }
                 })
             })
@@ -39,7 +42,5 @@ export = {
             client.logger.error('Synchronizing failed');
         }
         client.logger.success('Synchronized');
-
-
     }
 };

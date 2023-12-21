@@ -8,11 +8,12 @@ export = {
 
     async execute(client: CustomClient, member: GuildMember) {
         try {
-            if (!await client.prisma.user.findUnique({where: { id: member.user.id}})) {
+            if (!await client.prisma.user.findFirst({where: { id: member.user.id}})) {
                 await client.prisma.user.create({
                     data: {
                         id: member.user.id,
-                        req_xp: XpStep
+                        req_xp: XpStep,
+                        guilds: { connect: { id: member.guild.id }},
                     }
                 })
             }
