@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "dev": "ts-node src/index.ts dev",
+    "debug": "ts-node src/index.ts debug",
+    "deploy": "ts-node src/index.ts deploy",
     "build": "tsc -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,13 +15,14 @@
   "dependencies": {
     "@napi-rs/canvas": "^0.1.44",
     "@prisma/client": "^5.6.0",
+    "@types/mongoose": "^5.11.97",
     "@types/ms": "^0.7.34",
     "@types/node": "^20.10.0",
     "chalk": "^4.1.2",
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
+    "mongoose": "^8.0.3",
     "ms": "^2.1.3",
-    "prisma": "^5.6.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.2",
     "undici": "^6.0.1"

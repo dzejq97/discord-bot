@@ -15,7 +15,7 @@ export const command: ICommand = {
         required_permissions: [PermissionFlagsBits.Administrator]
     },
     async execute(context: CommandContext) {
-        if (await context.cooldown(this, this.meta.cooldown?.feedback_message)) return;
+        //if (await context.cooldown(this, this.meta.cooldown?.feedback_message)) return;
         if (!context.verifyAuthorPermissions(this.meta.required_permissions)) return;
 
         if (context.used_alias === 'ping') context.message.reply('pong');

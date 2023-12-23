@@ -7,10 +7,7 @@ import { configDotenv } from "dotenv";
 import CustomClient from "./classes/CustomClient";
 import 'dotenv/config';
 
-const result = configDotenv();
-if (result.error) throw result.error;
-console.log(result.parsed);
-
+configDotenv();
 
 const client = new CustomClient();
 client.init();

@@ -37,21 +37,16 @@ export = {
 
                 try {
                     if (first_char === '+') {
-                        await client.prisma.user.update({
-                            where: { id: target.id}, 
-                            data: { reputation: { increment: 1 }}
-                        });
+                        await client.mongo.User.findOneAndUpdate({ id: target.id }, { $inc: { reputation: 1}});
                         return;
                     } else if (first_char === '-') {
-                        await client.prisma.user.update({
-                            where: { id: target.id },
-                            data: { reputation: { decrement: 1 }}
-                        });
+                        await client.mongo.User.findOneAndUpdate({id: target.id }, { $inc: { reputation: -1}})
                         return;
                     }
                 } catch (error) {
                     return client.logger.error(String(error));
                 }
+        
         }
     }
 };

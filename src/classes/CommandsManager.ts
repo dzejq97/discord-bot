@@ -18,11 +18,9 @@ export default class CommandsManager {
         this.client = client
         this.prefixes = Prefixes;
 
-        this.client.logger.info("Loading commands");
         const categoriesPath = path.join(__dirname, '/../commands');
         const categoriesFolders = fs.readdirSync(categoriesPath);
         for (const category of categoriesFolders) {
-            this.client.logger.info(`Loading commands from ${category}:`);
             const commandsPath = path.join(categoriesPath, category);
             const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.ts'));
             // Format category name
@@ -31,15 +29,13 @@ export default class CommandsManager {
             if (!this.commands.get(categoryName)) this.commands.set(categoryName, new Collection<string, ICommand>());
 
             for ( const file of commandsFiles) {
-                this.client.logger.info(`Loading ${file} command.`)
                 const filePath = path.join(commandsPath, file);
                 const command: ICommand = require(filePath).command;
                 command.meta.category = categoryName;
                 this.commands.get(command.meta.category)?.set(command.meta.name, command);
             }
-            this.client.logger.success(`Loaded commands from ${category}`);
         }
-        this.client.logger.success('All commands loaded.')
+        this.client.logger.success('Commands loaded.')
     } 
 
     hasPrefix(content: string) {

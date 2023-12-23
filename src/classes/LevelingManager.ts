@@ -2,12 +2,13 @@ import CustomClient from "./CustomClient";
 import { DB_XpUpdateTimeout, XpMultiply, XpPerMessage, XpStep } from "../config.json";
 import { Collection, Message } from "discord.js";
 import ms from "ms";
-import { User } from "@prisma/client"
+import { HydratedDocument } from "mongoose";
+import { IUser } from "src/mongo/models/user";
 
 
 export default class LevelingManager {
     client: CustomClient;
-    update_cache: Collection<string, User> = new Collection();
+    update_cache: Collection<string, HydratedDocument<IUser>> = new Collection();
 
     constructor(client: CustomClient) {
         this.client = client;
@@ -22,27 +23,27 @@ export default class LevelingManager {
 
         setTimeout(async () => await this.DBPushUpdates(), ms(DB_XpUpdateTimeout));
     }
-
-    async updateUser(user: User) {
+    
+    async updateUser(user: HydratedDocument<IUser>) {
         try {
-            await this.client.prisma.user.update({
-                where: { id: user.id},
-                data: {
-                    xp: user.xp,
-                    level: user.level,
-                    req_xp: user.req_xp,
-                }
-            });
+            const g = await this.client.mongo.User.findOne({ id: user.id});
+            if (!g) return;
+
+            g.xp = user.xp,
+            g.level = user.level,
+            g.req_xp = user.req_xp
+
+            await g.save();
         } catch (error) {
             return this.client.logger.error(String(error));
         } finally {
             return this.update_cache.delete(user.id);
         }
-    }
+    } 
 
     calculateNextLevelExp(currentLevel: number): number {
         const next_level_xp = XpStep * XpPerMessage * (XpMultiply * currentLevel);
-        return next_level_xp;
+        return Math.round(next_level_xp);
 
     }
 
@@ -53,7 +54,7 @@ export default class LevelingManager {
             user = this.update_cache.get(msg.author.id);
         } else {
             try {
-                user = await this.client.prisma.user.findFirst({ where: { id: msg.author.id}});
+                user = await this.client.mongo.User.findOne({ id: msg.author.id });
             } catch (error) {
                 return this.client.logger.error(String(error));
             }
@@ -88,4 +89,5 @@ export default class LevelingManager {
             return;
         }
     }
+    
 }

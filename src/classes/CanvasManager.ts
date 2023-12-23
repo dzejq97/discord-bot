@@ -21,7 +21,7 @@ export default class CanvasManager {
         else user = member;
 
         try {
-            user_data = await this.client.prisma.user.findFirst({ where: {id: member.id }});
+            user_data = await this.client.mongo.User.findOne({ id: member.id });
             if (!user_data) return null;
 
             bg = await Canvas.loadImage("src/dependencies/bg1.jpg");
@@ -119,4 +119,4 @@ export default class CanvasManager {
         //await promises.writeFile(join(__dirname, 'test.png'), png);
 
     }
-}
+} 

@@ -8,18 +8,16 @@ export = {
 
     async execute(client: CustomClient, member: GuildMember) {
         try {
-            if (!await client.prisma.user.findFirst({where: { id: member.user.id}})) {
-                await client.prisma.user.create({
-                    data: {
-                        id: member.user.id,
-                        req_xp: XpStep,
-                        guilds: { connect: { id: member.guild.id }},
-                    }
+            if (!await client.mongo.User.findOne({ id: member.user.id })) {
+                const u = new client.mongo.User({
+                    id: member.user.id,
+                    req_xp: XpStep,
                 })
             }
         } catch (error) {
             console.log(error);
         }
         return;
+        
     }
 };

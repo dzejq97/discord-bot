@@ -10,11 +10,7 @@ export const command: ICommand = {
         const emb = context.client.embeds.empty();
 
         try {
-            let user = await context.client.prisma.user.findFirst({
-                where: { id: context.message.author.id },
-                select: { reputation: true }
-            });
-
+            let user = await context.client.mongo.User.findOne({id: context.message.author.id});
             if (!user) return;
 
             emb.setTitle(`You have ${user.reputation} reputation points`);

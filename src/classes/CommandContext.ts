@@ -3,8 +3,9 @@ import CommandsManager from "./CommandsManager";
 import ComandArgument from "./CommandArgument";
 import { Message, User, GuildMember, Guild, Collection, PermissionFlagsBits} from "discord.js";
 import { ICommand } from "src/interfaces/ICommand";
-import { Cooldown } from "@prisma/client";
 import ms from 'ms';
+import { HydratedDocument } from "mongoose";
+import { ICooldown } from "src/mongo/models/cooldown";
 
 export default class CommandContext {
     client: MainClient;
@@ -29,7 +30,7 @@ export default class CommandContext {
     }
 
     async cooldown(command:ICommand, feedback?: boolean): Promise<boolean> {
-        let cooldown: Cooldown | undefined = this.client.cooldowns.active.find(cool => cool.name === command.meta.cooldown?.name);
+        let cooldown: HydratedDocument<ICooldown> | undefined = this.client.cooldowns.active.find(cool => cool.name === command.meta.cooldown?.name);
         if (!cooldown && command.meta.cooldown) {
             cooldown = await this.client.cooldowns.setCooldown(
                 this.message.author.id,

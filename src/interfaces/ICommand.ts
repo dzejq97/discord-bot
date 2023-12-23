@@ -18,6 +18,7 @@ interface ICooldown {
     name: string,
     time: string,
     feedback_message?: boolean;
+    database_save?: boolean;
 }
 
 
