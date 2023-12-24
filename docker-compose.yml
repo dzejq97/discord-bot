@@ -1,0 +1,24 @@
+version: '3'
+services:
+  bot:
+    build: .
+    container_name: bot
+    restart: always
+    env_file:
+      - ./.env
+    depends_on:
+      - mongodb
+  mongodb:
+    image: mongo
+    env_file:
+      - ./.env
+    container_name: ${DB_HOST}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    volumes:
+      - dbdata:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+volumes:
+  dbdata:
