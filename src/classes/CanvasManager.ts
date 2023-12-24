@@ -10,6 +10,8 @@ export default class CanvasManager {
     client: CustomClient;
     constructor (client: CustomClient) {
         this.client = client;
+
+        Canvas.GlobalFonts.registerFromPath(join(__dirname, "..", "dependencies", "trebuc.ttf"), 'Trebuchet MS');
     }
 
     async getUserProfileBanner(member: GuildMember | User): Promise<AttachmentBuilder | null> {
@@ -28,6 +30,7 @@ export default class CanvasManager {
 
             const { body } = await request(member.displayAvatarURL({ extension: 'jpg' }));
             avatar = await Canvas.loadImage(await body.arrayBuffer());
+            //avatar = await Canvas.loadImage(member.displayAvatarURL({extension: 'jpg'}));
 
             percent = user_data.xp / user_data.req_xp;
 
@@ -36,6 +39,7 @@ export default class CanvasManager {
             return null;
         }
 
+        //Canvas.registerFont('src/dependencies/trebuc.ttf', { family: 'Trebuchet MS'})
         const canvas = Canvas.createCanvas(736, 345);
         const ctx = canvas.getContext("2d");    
         
@@ -111,6 +115,7 @@ export default class CanvasManager {
         ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
         ctx.fillText(`${user_data.xp}/${user_data.req_xp}xp`, 550, 294);
     
+        //const png = await canvas.encode('png');
         const png = await canvas.encode('png');
         const attachment = new AttachmentBuilder(png, {name: 'profile-image.jpg'});
         return attachment;

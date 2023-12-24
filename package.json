@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node src/index.ts dev",
+    "dev": "docker compose up -d mongodb && ts-node src/index.ts dev",
     "debug": "ts-node src/index.ts debug",
     "deploy": "ts-node src/index.ts deploy",
     "build": "tsc -p tsconfig.json",
