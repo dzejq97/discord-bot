@@ -1,4 +1,4 @@
-import * as mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 export interface IUser {
     id: string,
@@ -10,7 +10,7 @@ export interface IUser {
     level: number
 }
 
-const schema = new mongoose.Schema<IUser>({
+const schema = new Schema<IUser>({
     id: { type: String, required: true, unique: true },
     join_at: { type: Date, default: new Date() },
     money: { type: Number, default: 0 },
@@ -21,5 +21,4 @@ const schema = new mongoose.Schema<IUser>({
     level: { type: Number, default: 1 }
 });
 
-const user = mongoose.model('User', schema);
-export default user;
+export default model<IUser>('User', schema);

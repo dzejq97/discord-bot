@@ -1,31 +1,18 @@
 import CustomClient from "src/classes/CustomClient";
-import * as mongoose from "mongoose";
+import { Model } from "mongoose";
 
-import user from './models/user'
-import guild from "./models/guild";
-import cooldown from "./models/cooldown";
+import User, { IUser } from './models/user'
+import Guild, { IGuild } from "./models/guild";
+import Cooldown, { ICooldown } from "./models/cooldown";
 
 export default class MongoManager {
     client: CustomClient;
-    connection: mongoose.Connection | undefined;
-    connect_URL: string | undefined = "";
 
-    User = user;
-    Guild = guild;
-    Cooldown = cooldown
+    User: Model<IUser> = User;
+    Guild: Model<IGuild> = Guild;
+    Cooldown: Model<ICooldown> = Cooldown;
 
     constructor(client: CustomClient) {
         this.client = client;
-
-        this.connect_URL = process.env.DB_URL;
-    }
-
-    async connect() {
-        if (!this.connect_URL) {
-            console.log('Database URL not provided');
-            process.exit(1);
-        }
-        this.connection = (await mongoose.connect(this.connect_URL)).connection
-        
     }
 }

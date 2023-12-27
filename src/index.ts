@@ -6,10 +6,25 @@
 import { configDotenv } from "dotenv";
 import CustomClient from "./classes/CustomClient";
 import 'dotenv/config';
-
+import mongoose from "mongoose";
 configDotenv();
 
-const client = new CustomClient();
-client.init();
+const start = async () => {
+    if (!process.env.DB_URL) {
+        console.log('No database data in .env');
+        process.exit(1);
+    }
 
-client.login(process.env.TOKEN);
+    await mongoose.connect(process.env.DB_URL).then( () => {
+        console.log('Database connected');
+    })
+    .catch( err => {
+        console.log(err);
+        process.exit(1);
+    })
+
+    const client = new CustomClient();
+    client.login(process.env.TOKEN);
+}
+
+start();

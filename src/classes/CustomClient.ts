@@ -31,15 +31,17 @@ export default class CustomClient extends Client {
         else if (mode === 'deploy') this.run_mode = mode;
         else this.run_mode = 'deploy';
 
+        this.mongo = new MongoManager(this);
         this.logger.info(`Starting in ${this.run_mode.toUpperCase()} mode.`);
         this.commands = new CommandsManager(this);
-        this.mongo = new MongoManager(this);
         this.leveling = new LevelingManager(this);
         this.cooldowns = new CooldownManager(this);
         this.canvas = new CanvasManager(this);
+
+        this.init();
     }
 
-    async init() {
+    async init() {        
         const eventsPath = path.join(__dirname, '../events');
         const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
         for (const file of eventFiles) {
@@ -52,8 +54,6 @@ export default class CustomClient extends Client {
             }
         }
         this.logger.success(`Events loaded`)
-
-        await this.mongo.connect();
 
     }
 }

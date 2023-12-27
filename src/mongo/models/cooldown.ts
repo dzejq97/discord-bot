@@ -1,4 +1,4 @@
-import * as mongoose from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
 
 export interface ICooldown {
     user_id: string,
@@ -7,11 +7,11 @@ export interface ICooldown {
     time: number
 }
 
-const cooldown = mongoose.model('Cooldown', new mongoose.Schema<ICooldown>({
+const schema = new Schema<ICooldown>({
     user_id: { type: String, required: true },
     name: { type: String, required: true },
     start: { type: Date, default: new Date() },
     time: { type: Number, required: true },
-}));
+});
 
-export default cooldown;
+export default model<ICooldown>('Cooldown', schema);
