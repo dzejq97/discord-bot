@@ -30,24 +30,23 @@ export default class CooldownManager {
         }
     }
 
-    async setCooldown(user_id: string, name: string, time: number | string): Promise<HydratedDocument<ICooldown> | undefined> {
+    async setCooldown(user_id: string, name: string, time: number | string, save?: boolean): Promise<HydratedDocument<ICooldown> | undefined> {
         let cooldown_time;
         if (typeof time === 'string') cooldown_time = ms(time);
         else cooldown_time = time;
+
         try {
             const cooldown = new this.client.mongo.Cooldown({
                 name: name,
                 time: cooldown_time,
                 user_id: user_id
             });
-            await cooldown.save();
+            if (save) await cooldown.save();
 
             this.active.set(user_id, cooldown);
-            setTimeout(async () => await this.clearCooldown(user_id, name), cooldown.time);
-            return cooldown;
+            setTimeout(async () => await this.clearCooldown(user_id, name), cooldown_time);            
         } catch (error) {
-            this.client.logger.error(String(error));
-            return undefined;
+            return;
         }
     }
 

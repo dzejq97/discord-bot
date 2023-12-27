@@ -7,10 +7,12 @@ export const command: ICommand = {
         aliases: ["reputacja", "reputation", "r"],
     },
     async execute(context: CommandContext) {
+        console.log('rep');
         const emb = context.client.embeds.empty();
 
         try {
-            let user = await context.client.mongo.User.findOne({id: context.message.author.id});
+            let user = await context.client.mongo.User.findOne({ id: context.message.author.id });
+            console.log(user);
             if (!user) return;
 
             emb.setTitle(`You have ${user.reputation} reputation points`);

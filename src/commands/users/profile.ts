@@ -11,7 +11,9 @@ export const command: ICommand = {
         aliases: ["p", "profil", "prof"],
         cooldown: {
             name: "CMD_profile",
-            time: "5s"
+            time: "5s",
+            feedback_message: true,
+            database_save: false,
         }
     },
     async execute(context: CommandContext) {

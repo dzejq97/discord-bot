@@ -21,7 +21,7 @@ export default class MongoManager {
             (await this.client.guilds.fetch()).forEach( async (OAGuild) => {
                 const guild = await OAGuild.fetch();
 
-                if (!await this.Guild.find({ id: guild.id })) {
+                if (!await this.Guild.exists({ id: guild.id })) {
                     const g = new this.Guild({
                         id: guild.id,
                         owner_id: guild.ownerId,
@@ -31,7 +31,7 @@ export default class MongoManager {
                 
 
                 (await guild.members.fetch()).forEach( async (member) => {
-                    if (!await this.User.find({ id: member.user.id }) && !member.user.bot) {
+                    if (!await this.User.exists({ id: member.id }) && !member.user.bot) {
                         const m = new this.User({
                             id: member.user.id,
                         })

@@ -29,19 +29,20 @@ export default class CommandContext {
         await this.message.reply({embeds: [emb]});
     }
 
-    async cooldown(command:ICommand, feedback?: boolean): Promise<boolean> {
-        let cooldown: HydratedDocument<ICooldown> | undefined = this.client.cooldowns.active.find(cool => cool.name === command.meta.cooldown?.name);
+    async cooldown(command:ICommand): Promise<boolean> {
+        let cooldown = this.client.cooldowns.active.find(cool => cool.name === command.meta.cooldown?.name);
         if (!cooldown && command.meta.cooldown) {
-            cooldown = await this.client.cooldowns.setCooldown(
+            await this.client.cooldowns.setCooldown(
                 this.message.author.id,
                 command.meta.cooldown?.name,
-                command.meta.cooldown?.time
+                command.meta.cooldown?.time,
+                command.meta.cooldown.database_save,
             )
             return false;
         }
         else {
             if (command.meta.cooldown?.feedback_message && cooldown)
-                this.message.reply(`You can use this command again in ${ms((cooldown.start.getTime() + cooldown.time ) - Date.now())}`)
+                this.message.reply(`You can use this command again in ${ms(Date.now() - (cooldown.start.getTime() + cooldown.time ))}`)
             return true;
         }
     }

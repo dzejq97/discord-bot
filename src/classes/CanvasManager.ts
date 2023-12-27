@@ -39,7 +39,6 @@ export default class CanvasManager {
             return null;
         }
 
-        //Canvas.registerFont('src/dependencies/trebuc.ttf', { family: 'Trebuchet MS'})
         const canvas = Canvas.createCanvas(736, 345);
         const ctx = canvas.getContext("2d");    
         
