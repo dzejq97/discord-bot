@@ -22,7 +22,7 @@ export default class CommandsManager {
         const categoriesFolders = fs.readdirSync(categoriesPath);
         for (const category of categoriesFolders) {
             const commandsPath = path.join(categoriesPath, category);
-            const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.ts'));
+            const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
             // Format category name
             let categoryName = category.replace('_', ' ');
             categoryName = `${categoryName.charAt(0).toUpperCase()}${categoryName.substring(1)}`;

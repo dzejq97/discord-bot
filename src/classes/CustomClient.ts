@@ -1,5 +1,4 @@
 import { Client } from "discord.js";
-import { PrismaClient } from "@prisma/client";
 import intents from "../dependencies/intents"
 import fs from "node:fs";
 import path from "node:path";
@@ -42,7 +41,7 @@ export default class CustomClient extends Client {
 
     async init() {
         const eventsPath = path.join(__dirname, '../events');
-        const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.ts'));
+        const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
         for (const file of eventFiles) {
             const filePath = path.join(eventsPath, file);
             const event = require(filePath);
