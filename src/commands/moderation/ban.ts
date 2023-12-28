@@ -8,7 +8,7 @@ export const command: ICommand = {
         description: 'Ban member',
         aliases: ["b"],
         required_permissions: [PermissionFlagsBits.BanMembers],
-        proper_usage: "!ban <member> [multi_string]"
+        proper_usage: "!ban <member> [reason]"
     },
 
     async execute(context: CommandContext) {
