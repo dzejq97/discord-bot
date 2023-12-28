@@ -1,5 +1,5 @@
 import * as Canvas from "@napi-rs/canvas";
-import { AttachmentBuilder } from "discord.js";
+import { AttachmentBuilder, Guild } from "discord.js";
 import { promises } from "node:fs";
 import { join } from "node:path";
 import CustomClient from "./CustomClient";
@@ -14,7 +14,7 @@ export default class CanvasManager {
         Canvas.GlobalFonts.registerFromPath(join(__dirname, "..", "dependencies", "trebuc.ttf"), 'Trebuchet MS');
     }
 
-    async getUserProfileBanner(member: GuildMember | User): Promise<AttachmentBuilder | null> {
+    async getUserProfileBanner(member: GuildMember | User, guild: Guild): Promise<AttachmentBuilder | null> {
         if (!member) return null;
         
         let bg, avatar, percent, user, user_data;
@@ -23,7 +23,10 @@ export default class CanvasManager {
         else user = member;
 
         try {
-            user_data = await this.client.mongo.User.findOne({ id: member.id });
+            user_data = await this.client.mongo.Member.findOne({
+                id: member.id,
+                guild_id: guild.id,
+            });
             if (!user_data) return null;
 
             bg = await Canvas.loadImage("src/dependencies/bg1.jpg");

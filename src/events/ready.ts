@@ -8,7 +8,7 @@ export = {
 
     async execute(client: CustomClient) {
         client.logger.success(`Client ready! Logged in as ${client.user?.tag}`);
-        await client.mongo.synchronize();
+        await client.mongo.startupSync();
         await client.cooldowns.initLoadCooldowns();
         
     }

@@ -1,14 +1,16 @@
 import CustomClient from "src/classes/CustomClient";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 
-import User, { IUser } from './models/user'
+import Member, { IMember } from './models/member'
 import Guild, { IGuild } from "./models/guild";
 import Cooldown, { ICooldown } from "./models/cooldown";
+
+import { GuildMember, Guild as dsc_Guild } from "discord.js";
 
 export default class MongoManager {
     client: CustomClient;
 
-    User: Model<IUser> = User;
+    Member: Model<IMember> = Member;
     Guild: Model<IGuild> = Guild;
     Cooldown: Model<ICooldown> = Cooldown;
 
@@ -16,31 +18,63 @@ export default class MongoManager {
         this.client = client;
     }
 
-    async synchronize() {
+    async guildCreateAndSync(discordGuild: dsc_Guild) {
         try {
-            (await this.client.guilds.fetch()).forEach( async (OAGuild) => {
-                const guild = await OAGuild.fetch();
-
-                if (!await this.Guild.exists({ id: guild.id })) {
-                    const g = new this.Guild({
-                        id: guild.id,
-                        owner_id: guild.ownerId,
-                    })
-                    await g.save();
-                }
-                
-
-                (await guild.members.fetch()).forEach( async (member) => {
-                    if (!await this.User.exists({ id: member.id }) && !member.user.bot) {
-                        const m = new this.User({
-                            id: member.user.id,
-                        })
-                        await m.save();
+            let guild = await this.Guild.findOne({ id: discordGuild.id });
+            if (!guild) {
+                guild = new this.Guild({
+                    id: discordGuild.id,
+                    owner_id: discordGuild.ownerId,
+                    settings: {
+                        _id: new Types.ObjectId(),
                     }
-                })
+                });
+            }
+
+            const discordMembers = await discordGuild.members.fetch();
+            for (let discordMember of discordMembers.values()) {
+                if (!await this.Member.exists({ id: discordMember.id, guild_id: discordGuild.id })) {
+                    const member = new this.Member({
+                        id: discordMember.id,
+                        guild_id: discordGuild.id,
+                        guild: guild?._id
+                    });
+                    guild?.members.push(member._id);
+                    await guild?.save();
+                    await member.save();
+                }
+            }
+        } catch (error) {
+
+        }
+    }
+
+    async memberCreate(discordMember: GuildMember) {
+        let guild = await this.Guild.findOne({ id: discordMember.guild.id });
+        if ( !guild ) return;
+        let member = await this.Member.findOne({ id: discordMember.id, guild_id: discordMember.guild.id });
+
+        if ( !member ) {
+            member = new this.Member({
+                id: discordMember.id,
+                guild_id: discordMember.guild.id,
+                guild: guild._id
             })
-        } catch (err) {
-            console.log(String(err));
+        }
+        guild.members.push(member._id);
+        await guild.save();
+        await member.save();
+    }
+
+    async startupSync() {
+        try {
+            const OAGuilds = await this.client.guilds.fetch();
+            for ( let OAGuild of OAGuilds.values()) {
+                const discordGuild = await OAGuild.fetch();
+                this.guildCreateAndSync(discordGuild);
+            } 
+        } catch (error) {
+            
         }
     }
 }

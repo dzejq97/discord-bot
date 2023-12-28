@@ -3,12 +3,12 @@ import { DB_XpUpdateTimeout, XpMultiply, XpPerMessage, XpStep } from "../config.
 import { Collection, Message } from "discord.js";
 import ms from "ms";
 import { HydratedDocument } from "mongoose";
-import { IUser } from "src/mongo/models/user";
+import { IMember } from "src/mongo/models/member";
 
 
 export default class LevelingManager {
     client: CustomClient;
-    update_cache: Collection<string, HydratedDocument<IUser>> = new Collection();
+    update_cache: Collection<string, HydratedDocument<IMember>> = new Collection();
 
     constructor(client: CustomClient) {
         this.client = client;
@@ -24,9 +24,12 @@ export default class LevelingManager {
         setTimeout(async () => await this.DBPushUpdates(), ms(DB_XpUpdateTimeout));
     }
     
-    async updateUser(user: HydratedDocument<IUser>) {
+    async updateUser(user: HydratedDocument<IMember>) {
         try {
-            const g = await this.client.mongo.User.findOne({ id: user.id});
+            const g = await this.client.mongo.Member.findOne({
+                id: user.id,
+                guild: user.guild
+            });
             if (!g) return;
 
             g.xp = user.xp,
@@ -54,7 +57,10 @@ export default class LevelingManager {
             user = this.update_cache.get(msg.author.id);
         } else {
             try {
-                user = await this.client.mongo.User.findOne({ id: msg.author.id });
+                user = await this.client.mongo.Member.findOne({
+                    id: msg.author.id,
+                    guild: await this.client.mongo.Guild.findOne({ id: msg.guild?.id })
+                });
             } catch (error) {
                 return this.client.logger.error(String(error));
             }

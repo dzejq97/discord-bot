@@ -8,7 +8,7 @@ export = {
     async execute(client: CustomClient, member: GuildMember) {
         
         try {
-            await client.mongo.User.deleteOne({ id: member.user.id });
+            await client.mongo.Member.deleteOne({ id: member.user.id, guild_id: member.guild.id });
         } catch (error) {
             client.logger.error(String(error));
         }

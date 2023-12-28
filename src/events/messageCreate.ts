@@ -33,14 +33,14 @@ export = {
                     target = message.mentions.members?.first();
                     if (!target) return;
                 }
-                client.cooldowns.setCooldown(message.author.id, "TO_reputation", "30m");
+                client.cooldowns.setCooldown(message.author.id, "TO_reputation", "30m", false);
 
                 try {
                     if (first_char === '+') {
-                        await client.mongo.User.findOneAndUpdate({ id: target.id }, { $inc: { reputation: 1}});
+                        await client.mongo.Member.findOneAndUpdate({ id: target.id }, { $inc: { reputation: 1}});
                         return;
                     } else if (first_char === '-') {
-                        await client.mongo.User.findOneAndUpdate({id: target.id }, { $inc: { reputation: -1}})
+                        await client.mongo.Member.findOneAndUpdate({id: target.id }, { $inc: { reputation: -1}})
                         return;
                     }
                 } catch (error) {

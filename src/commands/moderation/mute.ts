@@ -6,6 +6,7 @@ import ms from "ms"
 export const command: ICommand = {
     meta: {
         name: "mute",
+        description: 'Timeout member',
         aliases: ["m"],
         required_permissions: [PermissionFlagsBits.KickMembers],
         proper_usage: "!mute <member> <time> [reason]",

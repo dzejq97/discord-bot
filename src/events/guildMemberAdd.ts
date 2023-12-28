@@ -7,16 +7,8 @@ export = {
     once: false,
 
     async execute(client: CustomClient, member: GuildMember) {
-        try {
-            if (!await client.mongo.User.exists({ id: member.user.id })) {
-                const u = new client.mongo.User({
-                    id: member.user.id,
-                    req_xp: XpStep,
-                })
-            }
-        } catch (error) {
-            console.log(error);
-        }
+        await client.mongo.memberCreate(member);
+
         return;
         
     }

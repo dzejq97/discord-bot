@@ -3,6 +3,7 @@ import intents from "../dependencies/intents"
 import fs from "node:fs";
 import path from "node:path";
 import * as mongoose from "mongoose";
+import { Prefixes } from "../config.json"
 
 import CommandsManager from "./CommandsManager";
 import Logger from "./Logger";
@@ -16,11 +17,12 @@ export default class CustomClient extends Client {
     run_mode: 'dev' | 'debug' | 'deploy';
     commands: CommandsManager;
     logger: Logger = new Logger();
-    embeds: EmbedsManager = new EmbedsManager();
+    embeds: EmbedsManager;
     leveling: LevelingManager;
     cooldowns: CooldownManager;
     canvas: CanvasManager;
     mongo: MongoManager;
+    prefixes = Prefixes
 
     constructor() {
         super(intents);
@@ -37,6 +39,7 @@ export default class CustomClient extends Client {
         this.leveling = new LevelingManager(this);
         this.cooldowns = new CooldownManager(this);
         this.canvas = new CanvasManager(this);
+        this.embeds = new EmbedsManager(this);
 
         this.init();
     }

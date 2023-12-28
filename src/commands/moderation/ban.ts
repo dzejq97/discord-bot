@@ -5,6 +5,7 @@ import { PermissionFlagsBits } from "discord.js";
 export const command: ICommand = {
     meta: {
         name: "ban",
+        description: 'Ban member',
         aliases: ["b"],
         required_permissions: [PermissionFlagsBits.BanMembers],
         proper_usage: "!ban <member> [multi_string]"

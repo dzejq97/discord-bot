@@ -5,6 +5,7 @@ import { PermissionFlagsBits } from "discord.js";
 export const command: ICommand = {
     meta: {
         name: "unmute",
+        description: 'Cancel member timeout',
         aliases: ["um"],
         required_permissions: [PermissionFlagsBits.KickMembers],
         proper_usage: "!unmute <member>",

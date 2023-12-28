@@ -20,8 +20,8 @@ export const command: ICommand = {
         if (await context.cooldown(this)) return;
 
         let img;
-        if (context.message.member)
-            img = await context.client.canvas.getUserProfileBanner(context.message.member);
+        if (context.message.member && context.message.guild)
+            img = await context.client.canvas.getUserProfileBanner(context.message.member, context.message.guild);
         else return;
 
         if (!img) return;

@@ -1,7 +1,40 @@
-import { EmbedBuilder } from 'discord.js';
-import predefined_embeds from '../dependencies/predefined_embeds';
+import { APIEmbedField, EmbedBuilder } from 'discord.js';
+import CustomClient from './CustomClient';
 
 export default class EmbedsManager {
+    client: CustomClient;
+    helpEmbeds: EmbedBuilder[] = [];
+
+    constructor(client: CustomClient) {
+        this.client = client;
+        this.createHelpEmbeds();
+    }
+
+    createHelpEmbeds() {
+        this.client.commands.commands.forEach( (commands, category) => {
+            const emb = new EmbedBuilder();
+            emb.setTitle(category);
+            
+            for (const command of commands.values()) {
+                const title = '`' + this.client.prefixes[0] + command.meta.name + '`';
+                let desc = "";
+                if (command.meta.description) desc += '**Description: **' + command.meta.description + '\n'
+                if (command.meta.proper_usage) desc += '**Usage:** `' + command.meta.proper_usage + '`\n';
+                if (command.meta.aliases) {
+                    desc += '**Aliases:** '
+                    for (const alias of command.meta.aliases) desc += '[`' + alias + '`] ';
+                    desc += '\n\n\n';
+                }
+
+                emb.addFields({
+                    name: title,
+                    value: desc,
+                });
+            }
+            this.helpEmbeds.push(emb);
+        })
+    }
+
     empty() {
         const emb = new EmbedBuilder();
         return emb;
@@ -10,9 +43,5 @@ export default class EmbedsManager {
     info(content: string) {
         const embed = new EmbedBuilder({title: content});
         return embed;
-    }
-
-    credits() {
-        return predefined_embeds.get('credits');
     }
 }
