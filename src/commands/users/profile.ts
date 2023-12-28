@@ -17,7 +17,7 @@ export const command: ICommand = {
         }
     },
     async execute(context: CommandContext) {
-        if (await context.cooldown(this)) return;
+        if (!await context.canExecute()) return;
 
         let img;
         if (context.message.member && context.message.guild)

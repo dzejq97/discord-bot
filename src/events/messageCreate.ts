@@ -33,7 +33,7 @@ export = {
                     target = message.mentions.members?.first();
                     if (!target) return;
                 }
-                client.cooldowns.setCooldown(message.author.id, "TO_reputation", "30m", false);
+                client.cooldowns.set(message.author.id, "TO_reputation", "30m", false);
 
                 try {
                     if (first_char === '+') {

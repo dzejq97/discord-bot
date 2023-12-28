@@ -12,12 +12,11 @@ export const command: ICommand = {
     },
     async execute(context: CommandContext) {
         try {
-            if (!context.verifyAuthorPermissions(this.meta.required_permissions))
-                return await context.executionFailed(`You have no permissions`);
+            if (!await context.canExecute()) return;
 
             const authorMember = context.message.member;
             const targetMember = await context.arguments?.shift()?.parseToMember();
-            const reason = context.joinArguments();
+            const reason = context.joinLeftArguments();
 
             if (!targetMember || !authorMember)
                 return await context.executionFailed(`Failed executing command`, this.meta.proper_usage);

@@ -9,16 +9,62 @@ import { ICooldown } from "src/mongo/models/cooldown";
 
 export default class CommandContext {
     client: MainClient;
-    commands_manager: CommandsManager;
+    command: ICommand = <ICommand>{}
     message: Message;
+    guild: Guild | null;
+    author: GuildMember | User;
     used_prefix?: string;
     used_alias?: string;
     arguments?: Array<ComandArgument>;
     parsed_arguments?: Collection<string, any>;
-    constructor (client: MainClient, commands_manager: CommandsManager, message: Message) {
+    constructor (client: MainClient, message: Message) {
         this.client = client;
-        this.commands_manager = commands_manager;
         this.message = message;
+        if (message.guild)
+            this.guild = message.guild;
+        else
+            this.guild = null;
+
+        this.author = message.author;
+
+    }
+
+    async canExecute(): Promise<boolean> {
+        // Check permissions
+        if (this.command.meta.required_permissions && this.message.member) {
+            if (!this.message.member.permissions.has(this.command.meta.required_permissions)) {
+                const reply = await this.message.reply(`You dont have permission to use this command`);
+                setTimeout( async () => await reply.delete(), ms('5s'));
+                setTimeout( async () => await this.message.delete(), ms('5s'));
+                return false;
+            }
+        }
+
+        // Check cooldown
+        if (this.command.meta.cooldown) {
+            let cooldown = this.client.cooldowns.active.find(cd => cd.name === this.command.meta.cooldown?.name && cd.user_id === this.author.id);
+            if (cooldown) {
+                if (this.command.meta.cooldown.feedback_message) {
+                    console.log(cooldown.time);
+                    console.log(cooldown.start)
+                    console.log(Date.now());
+                    const reply = await this.message.reply(`You can use this command again in ${ms(cooldown.time - (Date.now() - cooldown.start), {long: true})}`);
+
+                    setTimeout( async () => await reply.delete(), ms('5s'));
+                    setTimeout( async () => await this.message.delete(), ms('5s'));
+                    return false;
+                }
+            } else {
+                await this.client.cooldowns.set(
+                    this.author.id,
+                    this.command.meta.cooldown.name,
+                    this.command.meta.cooldown.time,
+                    this.command.meta.cooldown.database_save,
+                )
+            }
+        }
+
+        return true;
     }
 
     async executionFailed(msg: string, proper_usage?: string): Promise<void> {
@@ -27,30 +73,6 @@ export default class CommandContext {
         if (proper_usage && proper_usage.length > 0) emb.setDescription('Use `'+ proper_usage + '`');
 
         await this.message.reply({embeds: [emb]});
-    }
-
-    async cooldown(command:ICommand): Promise<boolean> {
-        let cooldown = this.client.cooldowns.active.find(cool => cool.name === command.meta.cooldown?.name);
-        if (!cooldown && command.meta.cooldown) {
-            await this.client.cooldowns.setCooldown(
-                this.message.author.id,
-                command.meta.cooldown?.name,
-                command.meta.cooldown?.time,
-                command.meta.cooldown.database_save,
-            )
-            return false;
-        }
-        else {
-            if (command.meta.cooldown?.feedback_message && cooldown)
-                this.message.reply(`You can use this command again in ${ms(Date.now() - (cooldown.start.getTime() + cooldown.time ))}`)
-            return true;
-        }
-    }
-
-    verifyAuthorPermissions(permissions: bigint[] | undefined): boolean {
-        if (!permissions) return false;
-        if (this.message.member?.permissions.has(permissions)) return true;
-        else return false;
     }
 
     verifyTargetPermissions(targetMember: GuildMember): boolean {
@@ -63,7 +85,7 @@ export default class CommandContext {
         return true;
     }
 
-    joinArguments(): string | null {
+    joinLeftArguments(): string | null {
         if (!this.arguments) return null;
         let str = "";
         for (const arg of this.arguments) {

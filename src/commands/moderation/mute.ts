@@ -13,14 +13,12 @@ export const command: ICommand = {
     },
 
     async execute(context: CommandContext) {
-            console.log('mute executed');
-            if (!context.verifyAuthorPermissions(this.meta.required_permissions))
-                return await context.executionFailed('You have no permissions');
+            if (!await context.canExecute()) return;
 
             const authorMember = context.message.member;
             const targetMember = await context.arguments?.shift()?.parseToMember();
             const time = context.arguments?.shift()?.parseToTime();
-            const reason = context.joinArguments();
+            const reason = context.joinLeftArguments();
 
             if (!targetMember || !authorMember || !time)
                 return await context.executionFailed(`Failed executing command`, this.meta.proper_usage);

@@ -47,7 +47,7 @@ export default class CommandsManager {
     
     seekForCommand(msg: Message) {
         if (!msg.guild || msg.author.bot) return;
-        const context = new CommandContext(this.client, this, msg);
+        const context = new CommandContext(this.client, msg);
 
         for (const prefix of this.prefixes) {
             if (msg.content.startsWith(prefix)) context.used_prefix = prefix;
@@ -67,12 +67,14 @@ export default class CommandsManager {
             category.forEach(command => {
                 if (command.meta.name === commandName) {
                     context.used_alias = commandName;
+                    context.command = command;
                     command.execute(context);
                     return;
                 } else {
                     command.meta.aliases?.forEach(alias => {
                         if (alias === commandName) {
                             context.used_alias = commandName;
+                            context.command = command;
                             command.execute(context);
                             return;
                         }
