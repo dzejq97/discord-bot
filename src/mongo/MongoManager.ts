@@ -1,5 +1,5 @@
 import CustomClient from "src/classes/CustomClient";
-import { Model, Types } from "mongoose";
+import { HydratedDocument, Model, Types } from "mongoose";
 
 import Member, { IMember } from './models/member'
 import Guild, { IGuild } from "./models/guild";
@@ -14,10 +14,31 @@ export default class MongoManager {
     Guild: Model<IGuild> = Guild;
     Cooldown: Model<ICooldown> = Cooldown;
 
+    cache_guilds: WeakMap<String, HydratedDocument<IGuild>> = new WeakMap();
+    cache_members: WeakMap<String, HydratedDocument<IMember>> = new WeakMap();
+
     constructor(client: CustomClient) {
         this.client = client;
     }
 
+    /*
+    async getMember(user_id: String, guild_id: String): Promise<HydratedDocument<IMember> | null> {
+        let member: HydratedDocument<IMember> | undefined | null = this.cache_members.get(user_id);
+        if (member) return member;
+        
+        member = await this.Member.findOne({ id: user_id, guild_id: guild_id });
+        if (member) {
+            this.cache_members.set( user_id, member );
+            return member;
+        }
+        return null;
+    }
+
+    async getGuild(guild_id: String): Promise<HydratedDocument<IGuild>|null> {
+        let guild: HydratedDocument<IGuild> | undefined | null = this.cache_guilds.get(guild_id);
+        if (guild) return guild;
+    }
+*/
     async guildCreateAndSync(discordGuild: dsc_Guild) {
         try {
             let guild = await this.Guild.findOne({ id: discordGuild.id });

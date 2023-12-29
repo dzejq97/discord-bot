@@ -1,24 +1,28 @@
 import MainClient from "src/classes/CustomClient";
 import CommandsManager from "./CommandsManager";
 import ComandArgument from "./CommandArgument";
-import { Message, User, GuildMember, Guild, Collection, PermissionFlagsBits} from "discord.js";
+import { Message, User, GuildMember, Guild, Collection, PermissionFlagsBits, MessagePayload} from "discord.js";
 import { ICommand } from "src/interfaces/ICommand";
 import ms from 'ms';
 import { HydratedDocument } from "mongoose";
 import { ICooldown } from "src/mongo/models/cooldown";
+import MongoManager from "src/mongo/MongoManager";
 
 export default class CommandContext {
     client: MainClient;
     command: ICommand = <ICommand>{}
     message: Message;
+    mongo: MongoManager;
     guild: Guild | null;
     author: GuildMember | User;
     used_prefix?: string;
     used_alias?: string;
     arguments?: Array<ComandArgument>;
     parsed_arguments?: Collection<string, any>;
+    
     constructor (client: MainClient, message: Message) {
         this.client = client;
+        this.mongo = client.mongo;
         this.message = message;
         if (message.guild)
             this.guild = message.guild;
@@ -27,6 +31,12 @@ export default class CommandContext {
 
         this.author = message.author;
 
+    }
+
+    async reply(content: string) {
+        const reply = await this.message.reply({content: content});
+        setTimeout(async () => await reply.delete(), ms('10s'));
+        setTimeout(async () => await this.message.delete(), ms('10s'));
     }
 
     async canExecute(): Promise<boolean> {

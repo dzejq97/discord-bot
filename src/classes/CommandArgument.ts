@@ -63,7 +63,7 @@ export default class CommandArgument {
         return false;
     }
 
-    async parseToChannel(): Promise<GuildBasedChannel | null> {
+    async parseToChannel(): Promise<GuildBasedChannel | null | undefined> {
         if (!this.isChannelMention() || !this.message.guild) return null;
 
         const channel_id = this.content.substring(2, this.content.length - 1)

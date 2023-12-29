@@ -22,7 +22,7 @@ export default class CustomClient extends Client {
     cooldowns: CooldownManager;
     canvas: CanvasManager;
     mongo: MongoManager;
-    prefixes = Prefixes
+    prefixes = Prefixes;
 
     constructor() {
         super(intents);
