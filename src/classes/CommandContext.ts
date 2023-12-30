@@ -1,11 +1,8 @@
 import MainClient from "src/classes/CustomClient";
-import CommandsManager from "./CommandsManager";
 import ComandArgument from "./CommandArgument";
 import { Message, User, GuildMember, Guild, Collection, PermissionFlagsBits, MessagePayload} from "discord.js";
 import { ICommand } from "src/interfaces/ICommand";
 import ms from 'ms';
-import { HydratedDocument } from "mongoose";
-import { ICooldown } from "src/mongo/models/cooldown";
 import MongoManager from "src/mongo/MongoManager";
 
 export default class CommandContext {

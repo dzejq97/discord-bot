@@ -30,24 +30,6 @@ export default class MongoManager {
         }
     }
 
-    /*
-    async getMember(user_id: String, guild_id: String): Promise<HydratedDocument<IMember> | null> {
-        let member: HydratedDocument<IMember> | undefined | null = this.cache_members.get(user_id);
-        if (member) return member;
-        
-        member = await this.Member.findOne({ id: user_id, guild_id: guild_id });
-        if (member) {
-            this.cache_members.set( user_id, member );
-            return member;
-        }
-        return null;
-    }
-
-    async getGuild(guild_id: String): Promise<HydratedDocument<IGuild>|null> {
-        let guild: HydratedDocument<IGuild> | undefined | null = this.cache_guilds.get(guild_id);
-        if (guild) return guild;
-    }
-*/
     async guildCreateAndSync(discordGuild: dsc_Guild) {
         try {
             let guild = await this.Guild.findOne({ id: discordGuild.id });
@@ -71,6 +53,7 @@ export default class MongoManager {
                     });
                     guild?.members.push(member._id);
                     await guild?.save();
+                    this.guilds_settings.set(guild.id, guild.settings);
                     await member.save();
                 }
             }

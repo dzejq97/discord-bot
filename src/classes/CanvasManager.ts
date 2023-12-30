@@ -1,6 +1,5 @@
 import * as Canvas from "@napi-rs/canvas";
 import { AttachmentBuilder, Guild } from "discord.js";
-import { promises } from "node:fs";
 import { join } from "node:path";
 import CustomClient from "./CustomClient";
 import { GuildMember, User } from "discord.js";

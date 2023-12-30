@@ -1,9 +1,7 @@
 import { ICommand } from "src/interfaces/ICommand";
 import CommandContext from "src/classes/CommandContext";
-import * as Canvas from "@napi-rs/canvas"
-import { AttachmentBuilder } from "discord.js";
-import { promises } from "fs";
-import { join } from "path";
+import ms from "ms";
+import { GuildMember } from "discord.js";
 
 export const command: ICommand = {
     meta: {
@@ -19,13 +17,24 @@ export const command: ICommand = {
     async execute(context: CommandContext) {
         if (!await context.canExecute()) return;
 
-        let img;
-        if (context.message.member && context.message.guild)
-            img = await context.client.canvas.getUserProfileBanner(context.message.member, context.message.guild);
-        else return;
+        let target: GuildMember | null | undefined;
+        if (context.arguments) {
+            try {
+                target = await context.arguments.shift()?.parseToMember();
+            } catch (err) {
+                if (err instanceof Error) console.log(err.message);
+            } finally {
+                target = context.message.member;
+            }
+        }
+        if (!target || !context.message.guild) return;
 
+        let img;
+        img = await context.client.canvas.getUserProfileBanner(target, context.message.guild);
         if (!img) return;
         
-        await context.message.reply({files: [img]});
+        const reply = await context.message.reply({files: [img]});
+        setTimeout(async () => await reply.delete(), ms('15s'));
+        setTimeout(async () => await context.message.delete(), ms('15s'));
     }
 }

@@ -2,7 +2,6 @@ import CommandContext from "../../classes/CommandContext";
 import { PermissionFlagsBits } from "discord.js";
 import { ICommand } from "../../interfaces/ICommand"
 import ms from "ms";
-import guild from "src/mongo/models/guild";
 
 export const command: ICommand = {
     meta: {

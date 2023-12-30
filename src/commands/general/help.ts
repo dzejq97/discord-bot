@@ -1,6 +1,5 @@
 import { ICommand } from "src/interfaces/ICommand";
 import CommandContext from "src/classes/CommandContext";
-import { PermissionFlagsBits } from "discord.js";
 import ms from "ms";
 
 export const command: ICommand = {

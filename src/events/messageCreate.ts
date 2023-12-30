@@ -1,6 +1,7 @@
 import { Events } from 'discord.js';
 import { Message } from 'discord.js';
 import MainClient from 'src/classes/CustomClient';
+
 export = {
     name: Events.MessageCreate,
     once: false,

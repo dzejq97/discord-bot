@@ -1,4 +1,4 @@
-import { APIEmbedField, EmbedBuilder } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import CustomClient from './CustomClient';
 
 export default class EmbedsManager {
