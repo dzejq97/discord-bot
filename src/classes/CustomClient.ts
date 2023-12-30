@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { Client, TextChannel } from "discord.js";
 import intents from "../dependencies/intents"
 import fs from "node:fs";
 import path from "node:path";
@@ -10,6 +10,8 @@ import LevelingManager from "./LevelingManager";
 import CooldownManager from "./CooldownManager";
 import MongoManager from "../mongo/MongoManager";
 import CanvasManager from "./CanvasManager";
+import { HydratedDocument } from "mongoose";
+import { IBumpRemind } from "src/mongo/models/bump_remind";
 
 export default class CustomClient extends Client {
     run_mode: 'dev' | 'debug' | 'deploy';
@@ -55,6 +57,18 @@ export default class CustomClient extends Client {
             }
         }
         this.logger.success(`Events loaded`)
+    }
 
+    async bumpRemind(bumpRemind: HydratedDocument<IBumpRemind>) {
+        const guild = await this.guilds.fetch(bumpRemind.guild_id);
+        let channel = await guild.channels.cache.get(bumpRemind.channel_id) as TextChannel;
+        if (!channel) {
+            channel = await guild.channels.fetch(bumpRemind.channel_id) as TextChannel;
+        }
+        
+        let lastBumper = await guild.members.fetch(bumpRemind.last_bumper_id);
+
+        await this.mongo.BumpRemind.deleteMany({ guild_id: guild.id });
+        await channel.send(`You can bump again this server!\nLast bumped by: ${lastBumper}`);
     }
 }

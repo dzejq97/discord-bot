@@ -11,6 +11,7 @@ export interface IMember {
     xp: number,
     req_xp: number,
     level: number,
+    bumps: number
 }
 
 const schema = new Schema<IMember>({
@@ -23,7 +24,8 @@ const schema = new Schema<IMember>({
     xp: { type: Number, default: 0 },
     //////// CHANGE THIS
     req_xp: { type: Number, default: XpStep},
-    level: { type: Number, default: 1 }
+    level: { type: Number, default: 1 },
+    bumps: { type: Number, default: 0},
 });
 
 export default model<IMember>('Member', schema);

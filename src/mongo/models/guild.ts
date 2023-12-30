@@ -15,9 +15,10 @@ export interface IGuildSettings {
     cmd_channel_mode: string,
     cmd_channel_blacklist: string[],
     cmd_channel_whitelist: string[],
-    
-    
+    bump_remind_roles: string[];
+
 }
+
 
 type GuildModelType = Model<IGuild>
 

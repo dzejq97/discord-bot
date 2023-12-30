@@ -4,6 +4,7 @@ import { HydratedDocument, Model, Types } from "mongoose";
 import Member, { IMember } from './models/member'
 import Guild, { IGuild, IGuildSettings } from "./models/guild";
 import Cooldown, { ICooldown } from "./models/cooldown";
+import BumpRemind, {IBumpRemind} from "./models/bump_remind";
 
 import { Collection, GuildMember, Guild as dsc_Guild } from "discord.js";
 
@@ -13,6 +14,7 @@ export default class MongoManager {
     Member: Model<IMember> = Member;
     Guild: Model<IGuild> = Guild;
     Cooldown: Model<ICooldown> = Cooldown;
+    BumpRemind: Model<IBumpRemind> = BumpRemind;
     
     guilds_settings: Collection<string, IGuildSettings> = new Collection();
 

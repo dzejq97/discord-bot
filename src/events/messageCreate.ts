@@ -1,12 +1,40 @@
-import { Events } from 'discord.js';
+import { Events, User } from 'discord.js';
 import { Message } from 'discord.js';
-import MainClient from 'src/classes/CustomClient';
+import ms from 'ms';
+import CustomClient from 'src/classes/CustomClient';
+import guild from 'src/mongo/models/guild';
 
 export = {
     name: Events.MessageCreate,
     once: false,
 
-    async execute(client: MainClient, message: Message) {
+    async execute(client: CustomClient, message: Message) {
+        // Detect bump
+        if (message.author.id === '302050872383242240' && message.embeds) {
+            let bumper: User | null, bumpSuccess: boolean;
+            if (message.mentions.repliedUser) bumper = message.mentions.repliedUser;
+            else return;
+
+            if (message.embeds[0].data.description?.startsWith('Podbito serwer!')) bumpSuccess = true;
+            else return;
+
+            if (bumpSuccess) {
+                try {
+                    const bumpRemind = new client.mongo.BumpRemind({
+                        guild_id: message.guild?.id,
+                        last_bumper_id: bumper.id,
+                        channel_id: message.channel.id,
+                    });
+                    await bumpRemind.save();
+                    client.mongo.Member.findOneAndUpdate({id: bumper.id}, {$inc: {bumps: 1}});
+                    setTimeout(async () => await client.bumpRemind(bumpRemind), ms('2h'));
+                } catch (err) {
+                    client.logger.error(String(err));
+                    return;
+                }
+            }
+        }
+
         if (message.author.bot || !message.guild) return;
 
         // Check if message is executing command
