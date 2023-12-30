@@ -2,7 +2,6 @@ import { Client } from "discord.js";
 import intents from "../dependencies/intents"
 import fs from "node:fs";
 import path from "node:path";
-import * as mongoose from "mongoose";
 import { Prefixes } from "../config.json"
 
 import CommandsManager from "./CommandsManager";
@@ -23,6 +22,7 @@ export default class CustomClient extends Client {
     canvas: CanvasManager;
     mongo: MongoManager;
     prefixes = Prefixes;
+
 
     constructor() {
         super(intents);

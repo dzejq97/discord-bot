@@ -10,6 +10,13 @@ export = {
 
         // Check if message is executing command
         if (client.commands.hasPrefix(message.content)) {
+            const g_settings = client.mongo.guilds_settings.get(message.guild.id);
+            if (g_settings?.cmd_channel_mode === 'blacklist') {
+                if (g_settings.cmd_channel_blacklist.find(id => id === message.channel.id)) return;
+            } else if (g_settings?.cmd_channel_mode === 'whitelist') {
+                if (!g_settings.cmd_channel_whitelist.find(id => id === message.channel.id)) return;
+            }
+
             client.commands.seekForCommand(message);
             return;
         }

@@ -2,10 +2,10 @@ import CustomClient from "src/classes/CustomClient";
 import { HydratedDocument, Model, Types } from "mongoose";
 
 import Member, { IMember } from './models/member'
-import Guild, { IGuild } from "./models/guild";
+import Guild, { IGuild, IGuildSettings } from "./models/guild";
 import Cooldown, { ICooldown } from "./models/cooldown";
 
-import { GuildMember, Guild as dsc_Guild } from "discord.js";
+import { Collection, GuildMember, Guild as dsc_Guild } from "discord.js";
 
 export default class MongoManager {
     client: CustomClient;
@@ -13,12 +13,21 @@ export default class MongoManager {
     Member: Model<IMember> = Member;
     Guild: Model<IGuild> = Guild;
     Cooldown: Model<ICooldown> = Cooldown;
+    
+    guilds_settings: Collection<string, IGuildSettings> = new Collection();
 
-    cache_guilds: WeakMap<String, HydratedDocument<IGuild>> = new WeakMap();
-    cache_members: WeakMap<String, HydratedDocument<IMember>> = new WeakMap();
 
     constructor(client: CustomClient) {
         this.client = client;
+    }
+
+    async guild_saveAndCache(guild: HydratedDocument<IGuild>) {
+        this.guilds_settings.set(guild.id, guild.settings);
+        try {
+            await guild.save();
+        } catch (error) {
+            if (error instanceof Error) return this.client.logger.error(error.message);
+        }
     }
 
     /*

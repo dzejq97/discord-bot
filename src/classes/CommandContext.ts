@@ -18,7 +18,6 @@ export default class CommandContext {
     used_prefix?: string;
     used_alias?: string;
     arguments?: Array<ComandArgument>;
-    parsed_arguments?: Collection<string, any>;
     
     constructor (client: MainClient, message: Message) {
         this.client = client;
