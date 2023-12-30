@@ -10,7 +10,7 @@ export = {
         if (message.author.bot || !message.guild) return;
 
         // Check if message is executing command
-        if (client.commands.hasPrefix(message.content)) {
+        if (client.commands.hasPrefix(message.content, message.guild)) {
             const g_settings = client.mongo.guilds_settings.get(message.guild.id);
             if (g_settings?.cmd_channel_mode === 'blacklist') {
                 if (g_settings.cmd_channel_blacklist.find(id => id === message.channel.id)) return;

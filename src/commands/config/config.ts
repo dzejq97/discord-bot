@@ -13,7 +13,6 @@ export const command: ICommand = {
     },
     async execute(context: CommandContext) {
         if (!await context.canExecute()) return;
-        const x = await context.mongo.Guild.findOne({id: 'cxzczxcxz'});
 
         if (!context.arguments || context.arguments[0].content === 'help' ) {
             const emb = context.client.embeds.empty();
@@ -37,13 +36,18 @@ export const command: ICommand = {
                 Add or remove channel from execution blacklist.
                 `
             });
+            emb.addFields({
+                name: '!config prefix <value>',
+                value: 'Change commands prefix. Default is `!`'
+            })
             await context.message.reply({embeds: [emb]});
             return;
         }
         
         if (context.arguments[0].content.toLowerCase() === 'cmd_channel_mode') {
             try {
-                const value = context.arguments[1].content.toLowerCase();
+                context.arguments.shift();
+                const value = context.arguments.shift()?.content.toLowerCase();
                 const guild = await context.mongo.Guild.findOne({ id: context.guild?.id });
                 if (!guild) throw new Error('No guild in database');
                 if (!value) {
@@ -224,6 +228,25 @@ export const command: ICommand = {
                         return;
                     }
                 }
+                return;
+            }
+        } else if (context.arguments[0].content.toLowerCase() === 'prefix') {
+            context.arguments.shift();
+
+            const prefix = context.arguments.shift()?.content;
+            if (!prefix) return await context.reply('Provide desired prefix');
+
+            if (prefix.length > 3) return await context.reply('Prefix too long, use maximum 3 characters');
+
+            try {
+                const guild = await context.mongo.Guild.findOne({id: context.guild?.id});
+                if (!guild) throw new Error('No guild in database');
+                guild.settings.prefix = prefix;
+                await context.mongo.guild_saveAndCache(guild);
+                await context.reply(`Prefix changed to **${prefix}**`);
+                return;
+            } catch (err) {
+                context.client.logger.error(String(err));
                 return;
             }
         }

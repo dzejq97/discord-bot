@@ -51,9 +51,6 @@ export default class CommandContext {
             let cooldown = this.client.cooldowns.active.find(cd => cd.name === this.command.meta.cooldown?.name && cd.user_id === this.author.id);
             if (cooldown) {
                 if (this.command.meta.cooldown.feedback_message) {
-                    console.log(cooldown.time);
-                    console.log(cooldown.start)
-                    console.log(Date.now());
                     const reply = await this.message.reply(`You can use this command again in ${ms(cooldown.time - (Date.now() - cooldown.start), {long: true})}`);
 
                     setTimeout( async () => await reply.delete(), ms('5s'));

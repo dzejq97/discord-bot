@@ -43,6 +43,7 @@ export default class MongoManager {
                 });
             }
 
+
             const discordMembers = await discordGuild.members.fetch();
             for (let discordMember of discordMembers.values()) {
                 if (!await this.Member.exists({ id: discordMember.id, guild_id: discordGuild.id })) {
@@ -52,11 +53,10 @@ export default class MongoManager {
                         guild: guild?._id
                     });
                     guild?.members.push(member._id);
-                    await guild?.save();
-                    this.guilds_settings.set(guild.id, guild.settings);
                     await member.save();
                 }
             }
+            this.guild_saveAndCache(guild);
         } catch (error) {
 
         }

@@ -1,4 +1,5 @@
 import { Schema, model, Types, Model} from 'mongoose';
+import { DefaultPrefix } from '../../config.json';
 
 export interface IGuild {
     id: string,
@@ -9,7 +10,8 @@ export interface IGuild {
 }
 
 export interface IGuildSettings {
-    _id: Types.ObjectId
+    _id: Types.ObjectId,
+    prefix: string;
     cmd_channel_mode: string,
     cmd_channel_blacklist: string[],
     cmd_channel_whitelist: string[],
@@ -26,6 +28,7 @@ const schema = new Schema<IGuild, GuildModelType>({
     owner_id: { type: String, required: true },
 
     settings: new Schema<IGuildSettings>({
+        prefix: {type: String, default: DefaultPrefix},
         cmd_channel_mode: { type: String, default: 'any'},
         cmd_channel_blacklist: [{ type: String }],
         cmd_channel_whitelist: [{ type: String }],

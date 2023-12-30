@@ -1,7 +1,8 @@
 node_modules
-dist
+dist/*
 debug.log
 src/config.json
+.VSCodeCounter
 
 .env
 

@@ -1,5 +1,6 @@
 import { EmbedBuilder } from 'discord.js';
 import CustomClient from './CustomClient';
+import { DefaultPrefix } from '../config.json';
 
 export default class EmbedsManager {
     client: CustomClient;
@@ -16,7 +17,7 @@ export default class EmbedsManager {
             emb.setTitle(category);
             
             for (const command of commands.values()) {
-                const title = '`' + this.client.prefixes[0] + command.meta.name + '`';
+                const title = '`' + DefaultPrefix + command.meta.name + '`';
                 let desc = "";
                 if (command.meta.description) desc += '**Description: **' + command.meta.description + '\n'
                 if (command.meta.proper_usage) desc += '**Usage:** `' + command.meta.proper_usage + '`\n';

@@ -1,22 +1,19 @@
-import { Prefixes } from "../config.json";
 import CustomClient from "./CustomClient";
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { Message, Collection } from 'discord.js';
+import { Message, Collection, Guild } from 'discord.js';
 import { ICommand } from "src/interfaces/ICommand";
 import CommandArgument from "./CommandArgument";
 import CommandContext from "./CommandContext";
 
 export default class CommandsManager {
     client: CustomClient;
-    prefixes: string[];
     commands: Collection<string, Collection<string, ICommand>> = new Collection();
 
     constructor(client: CustomClient) {
         this.client = client
-        this.prefixes = Prefixes;
 
         const categoriesPath = path.join(__dirname, '/../commands');
         const categoriesFolders = fs.readdirSync(categoriesPath);
@@ -38,10 +35,11 @@ export default class CommandsManager {
         this.client.logger.success('Commands loaded.')
     } 
 
-    hasPrefix(content: string) {
-        for (const prefix of this.prefixes) {
-            if (content.startsWith(prefix)) return true;
-        }
+    hasPrefix(content: string, guild: Guild): boolean {
+        const prefix = this.client.mongo.guilds_settings.get(guild.id)?.prefix;
+        if (!prefix) return false
+
+        if (content.startsWith(prefix)) return true;
         return false;
     }
     
@@ -49,10 +47,9 @@ export default class CommandsManager {
         if (!msg.guild || msg.author.bot) return;
         const context = new CommandContext(this.client, msg);
 
-        for (const prefix of this.prefixes) {
-            if (msg.content.startsWith(prefix)) context.used_prefix = prefix;
-        }
-        if (!context.used_prefix) return;
+        const prefix = this.client.mongo.guilds_settings.get(msg.guild.id)?.prefix;
+        if (!prefix) return;
+        context.used_prefix = prefix;
 
         const commandArgs: string[] = msg.content.substring(context.used_prefix.length).split(' ');
         const commandName = commandArgs.shift()?.toLowerCase();

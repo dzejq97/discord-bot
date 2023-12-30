@@ -2,7 +2,6 @@ import { Client } from "discord.js";
 import intents from "../dependencies/intents"
 import fs from "node:fs";
 import path from "node:path";
-import { Prefixes } from "../config.json"
 
 import CommandsManager from "./CommandsManager";
 import Logger from "./Logger";
@@ -21,7 +20,6 @@ export default class CustomClient extends Client {
     cooldowns: CooldownManager;
     canvas: CanvasManager;
     mongo: MongoManager;
-    prefixes = Prefixes;
 
 
     constructor() {
