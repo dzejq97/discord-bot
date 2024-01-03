@@ -69,6 +69,8 @@ export default class MongoManager {
         if ( !guild ) return;
         let member = await this.Member.findOne({ id: discordMember.id, guild_id: discordMember.guild.id });
 
+        // Create here exception if user is bot
+
         if ( !member ) {
             member = new this.Member({
                 id: discordMember.id,

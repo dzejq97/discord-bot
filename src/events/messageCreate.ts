@@ -9,27 +9,44 @@ export = {
     once: false,
 
     async execute(client: CustomClient, message: Message) {
+        /*  
+        if (message.embeds && message.guild) {
+            let bumper = message.mentions.repliedUser;
+
+            if (bumper && message.embeds[0].data.title?.startsWith('Configuration help')) {
+                console.log(`bumped by ${bumper.displayName}`);
+            }
+        }*/
+
+
         // Detect bump
-        if (message.author.id === '302050872383242240' && message.embeds) {
-            let bumper: User | null, bumpSuccess: boolean;
-            if (message.mentions.repliedUser) bumper = message.mentions.repliedUser;
-            else return;
+        if (message.author.id === client.user?.id) return;
+        if (message.embeds && message.author.bot && message.guild && message.embeds[0].data.description) {
+            let bumper = message.mentions.repliedUser;
+            console.log('bump#1')
 
-            if (message.embeds[0].data.description?.startsWith('Podbito serwer!')) bumpSuccess = true;
-            else return;
-
-            if (bumpSuccess) {
+            if (bumper && message.embeds[0].data.description.startsWith('Podbito serwer')) {
+                console.log('bump#2')
                 try {
-                    const bumpRemind = new client.mongo.BumpRemind({
-                        guild_id: message.guild?.id,
-                        last_bumper_id: bumper.id,
-                        channel_id: message.channel.id,
+                    await client.mongo.Member.findOneAndUpdate({
+                        id: bumper.id,
+                        guild_id: message.guild.id,
+                    }, {
+                        $inc: {bumps: 1},
                     });
-                    await bumpRemind.save();
-                    client.mongo.Member.findOneAndUpdate({id: bumper.id}, {$inc: {bumps: 1}});
-                    setTimeout(async () => await client.bumpRemind(bumpRemind), ms('2h'));
+
+                    const remind = new client.mongo.BumpRemind({
+                        guild_id: message.guild.id,
+                        last_bumper_id: bumper.id,
+                        channel_id: message.channel.id
+                    });
+
+                    await remind.save();
+                    
+                    setTimeout(async () => client.bumpRemind(remind), ms('2h'));
+                    console.log('bump#3');
+                    return;
                 } catch (err) {
-                    client.logger.error(String(err));
                     return;
                 }
             }
@@ -49,7 +66,6 @@ export = {
             client.commands.seekForCommand(message);
             return;
         }
-
         // Add user experience and calculate level up
         try {
             await client.leveling.resolveExperience(message);
