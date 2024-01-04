@@ -12,6 +12,7 @@ export = {
         await client.mongo.startupSync();
         await client.cooldowns.initLoadCooldowns();
 
+
         const reminds = await client.mongo.BumpRemind.find();
         for (const remind of reminds) {
             if (remind.last_bump_time.getTime() + ms('2h') <= Date.now()) {
@@ -19,7 +20,8 @@ export = {
                 await client.bumpRemind(remind);
                 return;
             } else {
-                setTimeout(async () => await client.bumpRemind(remind), ms('2h'));
+                const time_left: number = ms('2h') - (Date.now() - remind.last_bump_time.getTime());
+                setTimeout(async () => await client.bumpRemind(remind), time_left )
                 return;
             }
         }

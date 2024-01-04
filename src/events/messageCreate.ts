@@ -1,4 +1,4 @@
-import { Events, User } from 'discord.js';
+import { Events, TextChannel, User } from 'discord.js';
 import { Message } from 'discord.js';
 import ms from 'ms';
 import CustomClient from 'src/classes/CustomClient';
@@ -9,50 +9,39 @@ export = {
     once: false,
 
     async execute(client: CustomClient, message: Message) {
-        /*  
-        if (message.embeds && message.guild) {
-            let bumper = message.mentions.repliedUser;
+        // Bump detection
+        if (message.interaction?.type === 2 && message.guild) {
+            if (message.embeds[0].data) {
+                if (message.embeds[0].description?.startsWith('Podbito')) {
+                    const bumper = message.interaction.user;
+                    const guild = message.guild;
+                    try {
+                        await client.mongo.Member.findOneAndUpdate({
+                            id: bumper.id,
+                            guild_id: guild.id,
+                        }, {
+                            $inc: { bumps: 1 }
+                        });
+                        
+                        const remind = new client.mongo.BumpRemind({
+                            guild_id: guild.id,
+                            last_bumper_id: bumper.id,
+                            channel_id: message.channel.id,
+                        });
 
-            if (bumper && message.embeds[0].data.title?.startsWith('Configuration help')) {
-                console.log(`bumped by ${bumper.displayName}`);
-            }
-        }*/
+                        await remind.save();
 
-
-        // Detect bump
-        if (message.author.id === client.user?.id) return;
-        if (message.embeds && message.author.bot && message.guild && message.embeds[0].data.description) {
-            let bumper = message.mentions.repliedUser;
-            console.log('bump#1')
-
-            if (bumper && message.embeds[0].data.description.startsWith('Podbito serwer')) {
-                console.log('bump#2')
-                try {
-                    await client.mongo.Member.findOneAndUpdate({
-                        id: bumper.id,
-                        guild_id: message.guild.id,
-                    }, {
-                        $inc: {bumps: 1},
-                    });
-
-                    const remind = new client.mongo.BumpRemind({
-                        guild_id: message.guild.id,
-                        last_bumper_id: bumper.id,
-                        channel_id: message.channel.id
-                    });
-
-                    await remind.save();
-                    
-                    setTimeout(async () => client.bumpRemind(remind), ms('2h'));
-                    console.log('bump#3');
-                    return;
-                } catch (err) {
-                    return;
+                        setTimeout(async () => client.bumpRemind(remind), ms('2h'));
+                        await message.reply(`Bumped by ${bumper}`);
+                        return;
+                    } catch (err) {
+                        return;
+                    }
                 }
             }
         }
 
-        if (message.author.bot || !message.guild) return;
+        if (message.author.bot || !message.guild || !message.member) return;
 
         // Check if message is executing command
         if (client.commands.hasPrefix(message.content, message.guild)) {
@@ -68,9 +57,9 @@ export = {
         }
         // Add user experience and calculate level up
         try {
-            await client.leveling.resolveExperience(message);
-        } catch (error) {
-            return client.logger.error(String(error));
+            await client.leveling.giveExperience(message.member, 1, message.channel as TextChannel)
+        } catch (err) {
+            return client.logger.error(String(err));
         }
 
         // Check if message is giving someone rep

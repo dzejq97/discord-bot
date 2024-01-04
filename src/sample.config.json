@@ -1,5 +1,5 @@
 {
-    "Prefixes": ["!", "?"],
+    "DefaultPrefix": "!",
 
     "DB_XpUpdateTimeout": "5s",
     "XpPerMessage": 2,

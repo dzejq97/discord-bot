@@ -22,15 +22,12 @@ export const command: ICommand = {
             return;
         }
 
-        console.log(members);
-
         let str = "", i = 1;
         for (const member of members) {
             let m;
             try {
                 m = await context.message.guild?.members.fetch(member.id);
             } catch (err) {
-                console.log(err);
                 return;
             }
             str += `**${i}**: ${m?.displayName} - **${member.bumps}** bumps\n`;

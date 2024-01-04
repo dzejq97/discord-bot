@@ -1,6 +1,6 @@
 import CustomClient from "./CustomClient";
 import { DB_XpUpdateTimeout, XpMultiply, XpPerMessage, XpStep } from "../config.json";
-import { Collection, Message } from "discord.js";
+import { Collection, GuildChannel, GuildMember, Message, TextChannel } from "discord.js";
 import ms from "ms";
 import { HydratedDocument } from "mongoose";
 import { IMember } from "src/mongo/models/member";
@@ -50,48 +50,50 @@ export default class LevelingManager {
 
     }
 
-    async resolveExperience(msg: Message) {
-        let user;
-
-        if (this.update_cache.has(msg.author.id)) {
-            user = this.update_cache.get(msg.author.id);
+    async giveExperience(member: GuildMember, amount: number, default_channel?: TextChannel) {
+        let data;
+        if (this.update_cache.has(member.id)) {
+            data = this.update_cache.get(member.id);
         } else {
             try {
-                user = await this.client.mongo.Member.findOne({
-                    id: msg.author.id,
-                    guild: await this.client.mongo.Guild.findOne({ id: msg.guild?.id })
-                });
-            } catch (error) {
-                return this.client.logger.error(String(error));
+                data = await this.client.mongo.Member.findOne({ id: member.id, guild_id: member.guild.id });
+            } catch (err) {
+                return this.client.logger.error(String(err));
             }
         }
+        if (data) {
+            data.xp += amount;
+        } else {
+            return;
+        }
 
-        if (!user ||
-            user.xp == null ||
-            user.req_xp == null ||
-            user.level == null) return;
-        
-        user.xp += XpPerMessage;
+        if (data.xp >= data.req_xp) {
+            data.level++;
+            data.xp = data.xp - data.req_xp;
+            data.req_xp = this.calculateNextLevelExp(data.level);
 
-        if (user.xp >= user.req_xp) {
-            user.level++;
-            const xp_left = user.xp - user.req_xp;
-            user.xp = xp_left;
-            user.req_xp = this.calculateNextLevelExp(user.level);
-
-            const emb = this.client.embeds.empty();
-            emb.setTitle(`${msg.author.username} advanced from level ${user.level - 1} to level ${user.level}!`);
-            
-            try {
-                await msg.channel.send({embeds: [emb]});
-                await this.updateUser(user);
-            } catch (error) {
-                return this.client.logger.error(String(error));
-            } finally {
-                return;
+            if (this.client.mongo.guilds_settings.get(member.guild.id)?.levelup_channel) {
+                const levelup_channel_id = this.client.mongo.guilds_settings.get(member.guild.id)?.levelup_channel;
+                let channel: TextChannel;
+                try {
+                    if (levelup_channel_id) {
+                        channel = await member.guild.channels.fetch(levelup_channel_id) as TextChannel;
+                        if (!channel) throw new Error('NoLevelupChannel')
+                    }
+                } catch (err) {
+                    if (err instanceof Error) {
+                        if (err.message === 'NoLevelupChannel' && default_channel) {
+                            channel = default_channel;
+                        } else return;
+                    }
+                } finally {
+                    const emb = this.client.embeds.empty();
+                    emb.setTitle(`${member.displayName} advanced from **${data.level - 1} to **${data.level}** level!`);
+                    await channel!.send({embeds: [emb]});
+                }
             }
         } else {
-            this.update_cache.set(msg.author.id, user);
+            this.update_cache.set(member.id, data);
             return;
         }
     }
