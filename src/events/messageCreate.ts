@@ -2,7 +2,7 @@ import { Events, TextChannel, User } from 'discord.js';
 import { Message } from 'discord.js';
 import ms from 'ms';
 import CustomClient from 'src/classes/CustomClient';
-import guild from 'src/mongo/models/guild';
+import { XpPerMessage } from "../config.json"
 
 export = {
     name: Events.MessageCreate,
@@ -57,7 +57,7 @@ export = {
         }
         // Add user experience and calculate level up
         try {
-            await client.leveling.giveExperience(message.member, 1, message.channel as TextChannel)
+            await client.leveling.giveExperience(message.member, XpPerMessage, message.channel as TextChannel)
         } catch (err) {
             return client.logger.error(String(err));
         }
