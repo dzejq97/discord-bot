@@ -1,43 +1,41 @@
-# AIO Ubojnia Discord Bot
-Made with Node.js, Discord.js, Prisma and TypeScript
+# UBOJNIA Discord Bot
+
+Made with <3 and `Node.js`, `Discord.js`, `MongoDB + Mongoose.js` and `TypeScript`.
 
 ## Features
-### Moderation system
-- !mute
-- !unmute
-- !kick
-- !ban
-### Leveling and reputation(not finished)
-- Leveling working but not finished
-- Reputation points finished.
-Detects message replies and mentions, and triggered by message contents `+rep`, `-rep`, `+1`, `-1`.
-Example:
-> `+1 @mention`
-or
-> `+1` as message reply
+
+- TODO
+- TODO
 
 ## Installation
-1. Clone repository:
+
+#### Download
+
+Clone repository using
+
 > `git clone https://github.com/dzejq97/discord-bot.git`
 
-2. Install dependencies:
-> `npm ci`
+#### Configuration
 
-3. Configuration:
-> Edit and rename `template.config.json` to `config.json` at `./src`.
+Provide `sample.env` file with database URL and Discord Token, rename it to `.env`. 
+Checkout `src/config.json` and edit global settings as you like.
 
-> Edit and rename `template.env` to `.env` at `./`
+###### Docker build
 
-4. Start with:
-> `npm run start`
+1. Create docker image:
+   
+   > docker build --tag image_name .
 
+2. Start container:
+   
+   > docker run -d image_name
 
-## TO DO:
-- [x] Moderation
-- [ ] Economy
-- [ ] Role-Reactions/Verifications
-- [ ] Tickets
-- [ ] Leveling
-- and much more...
+###### Direct build
 
-Detailed TODO's in GitHub issues
+1. Install node dependencies:
+   
+   > `npm ci`
+
+2. Run bot:
+   
+   > `npm run start`
