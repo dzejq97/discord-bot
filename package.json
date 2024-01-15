@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "npm run build && node dist/index.js",
+    "v": "npm run build && node dist/index.js -v",
     "start": "npm run build && copyfiles --flat .env dist && copyfiles --flat src/dependencies/trebuc.ttf dist/dependencies && node dist/index.js",
-    "build": "tsc -p tsconfig.json",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc -p tsconfig.json"
   },
   "author": "",
   "license": "ISC",

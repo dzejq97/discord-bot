@@ -1,84 +1,96 @@
-import CustomClient from "./CustomClient";
-
-import fs from 'node:fs';
-import path from 'node:path';
-
-import { Message, Collection, Guild } from 'discord.js';
-import { ICommand } from "src/interfaces/ICommand";
-import CommandArgument from "./CommandArgument";
+import ICommand from "src/interfaces/ICommand";
+import UClient from "./UClient";
+import { Collection, Message } from "discord.js";
+import ms from "ms";
 import CommandContext from "./CommandContext";
 
 export default class CommandsManager {
-    client: CustomClient;
-    commands: Collection<string, Collection<string, ICommand>> = new Collection();
+    private client: UClient;
+    private list: Collection<string, ICommand> = new Collection
+    constructor(client: UClient) {
+        this.client = client;
+    }
 
-    constructor(client: CustomClient) {
-        this.client = client
+    async load() {
+        this.client.log.info(`Indexing commands`);
+        const str_cache: string[] = [];
+        for (const module of this.client.modules.values()) {
+            const commands: ICommand[] = module.commands.values();
+            for (const command of commands) {
+                if (str_cache.find(v => v === command.meta.name)) {
+                    throw new Error(`Command ${command.meta.name} of module ${module.meta.name} or its aliases exists in global scope`);
+                } else {
+                    str_cache.push(command.meta.name);
+                }
 
-        const categoriesPath = path.join(__dirname, '/../commands');
-        const categoriesFolders = fs.readdirSync(categoriesPath);
-        for (const category of categoriesFolders) {
-            const commandsPath = path.join(categoriesPath, category);
-            const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-            // Format category name
-            let categoryName = category.replace('_', ' ');
-            categoryName = `${categoryName.charAt(0).toUpperCase()}${categoryName.substring(1)}`;
-            if (!this.commands.get(categoryName)) this.commands.set(categoryName, new Collection<string, ICommand>());
+                if (command.meta.aliases) {
+                    for (const alias of command.meta.aliases) {
+                        if (str_cache.find(v => v === alias)) {
+                            throw new Error(`Command ${command.meta.name} of module ${module.meta.name} or its aliases exists in global scope`);
+                        } else {
+                            str_cache.push(alias);
+                        }
+                    }
+                }
 
-            for ( const file of commandsFiles) {
-                const filePath = path.join(commandsPath, file);
-                const command: ICommand = require(filePath).command;
-                command.meta.category = categoryName;
-                this.commands.get(command.meta.category)?.set(command.meta.name, command);
+                command.module = module;
+                this.list.set(command.meta.name, command);
+                this.client.log.info(`Indexed ${command.meta.name}`);
             }
         }
-        this.client.logger.success('Commands loaded.')
-    } 
-
-    hasPrefix(content: string, guild: Guild): boolean {
-        const prefix = this.client.mongo.guilds_settings.get(guild.id)?.prefix;
-        if (!prefix) return false
-
-        if (content.startsWith(prefix)) return true;
-        return false;
+        this.client.log.success(`All commands indexed`)
     }
-    
-    seekForCommand(msg: Message) {
-        if (!msg.guild || msg.author.bot) return;
-        const context = new CommandContext(this.client, msg);
 
-        const prefix = this.client.mongo.guilds_settings.get(msg.guild.id)?.prefix;
-        if (!prefix) return;
+    async seek(msg: Message): Promise<boolean> {
+        // Get guild prefix here later
+        const prefix = this.client.config.default_prefix;
+
+        // Check if message starts with prefix
+        if (!msg.content.startsWith(prefix)) return false;
+
+        // Create context and assign used prefix
+        const context = new CommandContext(this.client, msg);
         context.used_prefix = prefix;
 
-        const commandArgs: string[] = msg.content.substring(context.used_prefix.length).split(' ');
-        const commandName = commandArgs.shift()?.toLowerCase();
-        if (!commandName) return;
+        // Split message into array and pick command name
+        const args = msg.content.substring(prefix.length).split(' ');
+        const commandName = args.shift()?.toLowerCase();
+        context.args = args;
 
-        if (commandArgs.length > 0) {
-            context.arguments = [];
-            for (const arg of commandArgs) context.arguments.push(new CommandArgument(arg, this.client, msg));
-        }
-
-        this.commands.forEach(category => {
-            category.forEach(command => {
-                if (command.meta.name === commandName) {
-                    context.used_alias = commandName;
-                    context.command = command;
-                    command.execute(context);
-                    return;
+        // Search commands list and execute
+        this.list.forEach(async (command) => {
+            if (command.meta.name === commandName) {
+                context.used_alias = commandName;
+                context.command = command;
+                if (await this.verifyRequirements(msg, command)) {
+                    if (command.meta.autodelete_trigger_message)
+                        await msg.delete();
+                    await command.execute(context);
+                    return true;
                 } else {
-                    command.meta.aliases?.forEach(alias => {
-                        if (alias === commandName) {
-                            context.used_alias = commandName;
-                            context.command = command;
-                            command.execute(context);
-                            return;
-                        }
-                    })
+                    return false;
                 }
-            })
+            } else {
+                command.meta.aliases?.forEach(async (alias) => {
+                    if (alias === commandName) {
+                        context.used_alias = commandName;
+                        context.command = command;
+                        if (await this.verifyRequirements(msg, command)) {
+                            if (command.meta.autodelete_trigger_message)
+                                await msg.delete();
+                            await command.execute(context);
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                })
+            }
         })
+        return false;
     }
 
-};
+    async verifyRequirements(msg: Message, command: ICommand): Promise<boolean> {
+        return true;
+    }
+}

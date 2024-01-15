@@ -1,30 +1,33 @@
-// U B O J N I About Discord bot
-// v0.0.0
-// Created with <3 by Dawid Niedziółka @SZajbuS
-// dniedziolka1997@gmail.com
-
 import { configDotenv } from "dotenv";
-import CustomClient from "./classes/CustomClient";
-import 'dotenv/config';
-import mongoose from "mongoose";
+import { Logger } from "./classes/Logger";
 configDotenv();
 
-const start = async () => {
-    if (!process.env.DB_URL) {
-        console.log('No database data in .env');
-        process.exit(1);
-    }
+import mongoose from "mongoose";
+import UClient from "./classes/UClient";
+const log: Logger = require('./classes/Logger')
 
+
+const start = async() => {
+    if (!process.env.DB_URL) return console.log('Provide database URL in .env file');
+    /*if (!process.env.TOKEN) {
+        console.log('Provide discord token in .env file');
+        process.exit();
+    }*/
+    
+    log.info('Connecting MongoDB')
     await mongoose.connect(process.env.DB_URL).then( () => {
-        console.log('Database connected');
+        log.success('MongoDB connected')
     })
     .catch( err => {
-        console.log(err);
-        process.exit(1);
+        log.error(err, true);
     })
 
-    const client = new CustomClient();
-    client.login(process.env.TOKEN);
+    const client = new UClient();
+    await client.run();
 }
 
-start();
+try {
+    start();
+} catch(err) {
+    log.error(err, true);
+}

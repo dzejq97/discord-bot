@@ -1,8 +1,3 @@
 {
-    "DefaultPrefix": "!",
-
-    "DB_XpUpdateTimeout": "5s",
-    "XpPerMessage": 2,
-    "XpStep": 10,
-    "XpMultiply": 1.115
+    "default_prefix": "!"
 }
