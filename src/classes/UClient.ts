@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import CommandsManager from "./CommandsManager";
 import { Logger } from './Logger';
-import DatabaseManager from "src/database/DatabaseManager";
+import DatabaseManager from "../database/DatabaseManager";
 
 export default class UClient extends Client{
     config = config;
@@ -21,8 +21,9 @@ export default class UClient extends Client{
         super(options);
         if (process.argv.find(v => v === '-v')) this.verbose = true;
 
-        this.commands = new CommandsManager(this);
         this.database = new DatabaseManager(this);
+        this.commands = new CommandsManager(this);
+        
         this.log.client = this;
 
     }
@@ -35,7 +36,7 @@ export default class UClient extends Client{
             this.log.error(err, true);
         } finally {
             try {
-                //await this.login(process.env.TOKEN);
+                await this.login(process.env.TOKEN);
             } catch (err) {
                 this.log.error(err, true);
             }

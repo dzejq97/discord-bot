@@ -15,8 +15,9 @@ export default interface ICommand {
             author_permissions?: typeof PermissionFlagsBits[]; // Execute when author has given permissions
         },
         cooldown?: {
+            name: string, // Unique cooldown name, make sure to not repeat them in different files
             time: string, // Cooldown time in string. Example: '15m'/'2h'/'7d'
-            feedback_mesage?: string, // Send feedback on failed execution with time left to next use
+            feedback_message?: string, // Send feedback on failed execution with time left to next use
             database_save?: boolean, // Save cooldown to database and reload it in case of bot restart.
         } 
     },

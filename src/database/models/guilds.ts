@@ -18,7 +18,7 @@ interface IGuildConfig {
 }
 
 interface IGuildMethods {
-    updateConfig(database: DatabaseManager): Promise<boolean>,
+    update(database: DatabaseManager): Promise<boolean>,
 }
 
 type GuildModelType = Model<IGuild, {}, IGuildMethods>;
@@ -34,10 +34,11 @@ const schema = new Schema<IGuild, GuildModelType, IGuildMethods>({
         prefix: { type: String, default: default_prefix }
     })
 });
-schema.method('updateConfig', async function updateConfig(database: DatabaseManager) {
-    database.guilds.GuildConfigs.set(this.id, this.config);
+schema.method('update', async function update(database: DatabaseManager) {
+    database.guilds.guilds_configs.set(this.id, this.config);
     try {
         await this.save();
+        database.guilds.cache.set(this.id, this);
     } catch (err) {
         database.client.log.error(err);
     }
@@ -48,12 +49,30 @@ schema.method('updateConfig', async function updateConfig(database: DatabaseMana
 export default class db_GuildsManager {
     private client: UClient;
     private database: DatabaseManager;
-    GuildModel: GuildModelType = model<IGuild, GuildModelType>('Guild', schema);
-    GuildConfigs: Collection<string, IGuildConfig> = new Collection();
+    private GuildModel: GuildModelType = model<IGuild, GuildModelType>('Guild', schema);
+    cache: Collection<string, HydratedDocument<IGuild>> = new Collection();
+    guilds_configs: Collection<string, IGuildConfig> = new Collection();
 
-    constructor(client: UClient, database: DatabaseManager) {
+    constructor(client: UClient) {
         this.client = client;
-        this.database = database;
+        this.database = client.database;
+    }
+
+    async exists(guild: Guild | string): Promise<boolean> {
+        let id: string;
+
+        if (guild instanceof Guild) id = guild.id;
+        else id = guild;
+
+        let result;
+        try{
+            result = await this.GuildModel.exists({ id: id });
+        } catch (err) {
+            this.client.log.error(err);
+            return false;
+        }
+        if(result) return true;
+        else return false;
     }
 
     async get(guild: Guild | string): Promise<HydratedDocument<IGuild> | null> {
@@ -63,20 +82,31 @@ export default class db_GuildsManager {
 
         if (!id) return null;
         else {
-            let doc: HydratedDocument<IGuild> | null = null;
+            let doc;
+            doc = this.cache.get(id);
+            if (doc) return doc;
+
             try{
                 doc = await this.GuildModel.findOne({ id: id });
             } catch (err) {
                 this.client.log.error(err);
+                return null;
             }
 
             if(!doc) return null;
-            else return doc;
+            else {
+                this.cache.set(doc.id, doc);
+                this.guilds_configs.set(doc.id, doc.config);
+                return doc;
+            }
         }
     }
 
     async getOrCreate(guild: Guild): Promise<HydratedDocument<IGuild> | null> {
-        let doc: HydratedDocument<IGuild> | null;
+        let doc;
+        
+        doc = this.cache.get(guild.id);
+        if (doc) return doc;
 
         try {
             doc = await this.GuildModel.findOne({ id: guild.id });
@@ -84,16 +114,14 @@ export default class db_GuildsManager {
                 doc = await this.GuildModel.create({
                     id: guild.id,
                     owner_id: guild.ownerId
-                });
-                
-                await doc.save();
+                });                
                 return doc;
             } else {
                 return doc;
             }
         } catch (err) {
             this.client.log.error(err);
+            return null;
         }
-        return null;
     }
 }

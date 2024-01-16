@@ -3,12 +3,15 @@ import UClient from "./UClient";
 import { Collection, Message } from "discord.js";
 import ms from "ms";
 import CommandContext from "./CommandContext";
+import CooldownManager from "src/database/models/cooldowns";
 
 export default class CommandsManager {
     private client: UClient;
-    private list: Collection<string, ICommand> = new Collection
+    private list: Collection<string, ICommand> = new Collection();
+    private cooldowns: CooldownManager;
     constructor(client: UClient) {
         this.client = client;
+        this.cooldowns = client.database.cooldowns;
     }
 
     async load() {
@@ -91,6 +94,7 @@ export default class CommandsManager {
     }
 
     async verifyRequirements(msg: Message, command: ICommand): Promise<boolean> {
+        if (!await this.cooldowns.check(msg, command)) return false;
         return true;
     }
 }
