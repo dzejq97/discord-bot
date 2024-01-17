@@ -65,27 +65,47 @@ export default class CommandsManager {
             if (command.meta.name === commandName) {
                 context.used_alias = commandName;
                 context.command = command;
+
+                if (command.subcommands && context.args && context.args[0]) {
+                    const subcommand = command.subcommands.find(sub => sub.meta.name === context.args![0].toLowerCase());
+                    if (subcommand && await this.verifyRequirements(msg, subcommand)) {
+                        context.args.shift();
+                        if (subcommand.meta.autodelete_trigger_message) await msg.delete();
+                        await subcommand.execute(context);
+                        return true;
+                    }
+                }
+
                 if (await this.verifyRequirements(msg, command)) {
-                    if (command.meta.autodelete_trigger_message)
-                        await msg.delete();
+                    if (command.meta.autodelete_trigger_message) await msg.delete();
                     await command.execute(context);
                     return true;
-                } else {
-                    return false;
                 }
+
+                return false;
             } else {
                 command.meta.aliases?.forEach(async (alias) => {
                     if (alias === commandName) {
                         context.used_alias = commandName;
                         context.command = command;
+
+                        if (command.subcommands && context.args && context.args[0]) {
+                            const subcommand = command.subcommands.find(sub => sub.meta.name === context.args![0].toLowerCase());
+                            if (subcommand && await this.verifyRequirements(msg, subcommand)) {
+                                context.args.shift();
+                                if (subcommand.meta.autodelete_trigger_message) await msg.delete();
+                                await subcommand.execute(context);
+                                return true;
+                            }
+                        }
+
                         if (await this.verifyRequirements(msg, command)) {
-                            if (command.meta.autodelete_trigger_message)
-                                await msg.delete();
+                            if (command.meta.autodelete_trigger_message) await msg.delete();
                             await command.execute(context);
                             return true;
-                        } else {
-                            return false;
                         }
+
+                        return false;
                     }
                 })
             }

@@ -3,14 +3,14 @@ import CommandContext from "src/classes/CommandContext"
 
 module.exports = <ICommand>{
     meta: {
-        name: 'ping',
-        aliases: ['pong'],
+        name: 'all',
+        autodelete_reply_message: false,
+        autodelete_trigger_message: true,
+        requirements: {
+            only_guild_moderator: true,
+        }
     },
     async execute(context: CommandContext) {
-        if (context.used_alias === 'ping') {
-            context.respond('pong');
-        } else {
-            context.respond('ping');
-        }
+        //
     }
 }

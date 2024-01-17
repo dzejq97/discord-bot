@@ -16,7 +16,7 @@ interface ICooldown {
 
 type CooldownModelType = Model<ICooldown>;
 
-const schema = new Schema<ICooldown>({
+const schema = new Schema<ICooldown, CooldownModelType>({
     _id: { type: Schema.Types.ObjectId, required: true, default: new Types.ObjectId() },
     user_id: { type: String, required: true },
     guild_id: { type: String, required: true},

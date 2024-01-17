@@ -4,20 +4,14 @@ import fs from 'node:fs';
 import path from 'node:path'
 import ICommand from "src/interfaces/ICommand";
 import IEvent from "src/interfaces/IEvent";
-
-interface IModuleMeta {
-    moduleDir: string,
-    name: string;
-    description: string;
-    toggleable: boolean,
-}
-
-
+import { Model } from "mongoose";
+import IModuleMeta from "src/interfaces/IModuleMeta";
 
 export default class Module {
     private client: UClient | undefined;
     meta: IModuleMeta | undefined;
     commands: Collection<string, ICommand> = new Collection();
+    models: Collection<string, Model<any>> = new Collection();
 
     async load(client: UClient): Promise<void> {
         if (!this.meta) throw new Error('Module meta is undefined');
@@ -54,9 +48,23 @@ export default class Module {
             for (const file of commandsFiles.filter(v => v.endsWith('.js'))) {
                 const command: ICommand = require(path.join(commandsDir, file));
                 command.module = this;
+                //Look for subcommands
+                const subcommandsDirName = file.substring(0, file.length - 3);
+                if (commandsFiles.find(v => v === subcommandsDirName)) {
+                    client.log.info(`Loading subcommands of ${command.meta.name}`);
+                    const subcommandsDir = path.join(commandsDir, subcommandsDirName);
+                    const subcommandsFiles = fs.readdirSync(subcommandsDir);
+                    for (const subcommandFile of subcommandsFiles.filter(v => v.endsWith('.js'))) {
+                        const subcommand: ICommand = require(path.join(subcommandsDir, subcommandFile));
+                        if (!command.subcommands) command.subcommands = [];
+                        command.subcommands.push(subcommand);
+                        subcommand.parent_command = command;
+                        client.log.info(`Loaded subcommand ${subcommand.meta.name} of ${command.meta.name}`);
+                    }
+                }
                 if (!command.meta) throw new Error(`Undefined meta in ${file}`);
                 this.commands.set(command.meta.name, command);
-                client.log.info(`Loaded ${command.meta.name} command.`)
+                client.log.info(`Loaded ${command.meta.name} command.`);
             }
             client.log.info(`Loaded ${this.meta.name} commands`)
         }

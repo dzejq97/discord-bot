@@ -36,7 +36,7 @@ export default class UClient extends Client{
             this.log.error(err, true);
         } finally {
             try {
-                await this.login(process.env.TOKEN);
+                //await this.login(process.env.TOKEN);
             } catch (err) {
                 this.log.error(err, true);
             }

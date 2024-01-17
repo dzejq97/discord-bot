@@ -2,6 +2,7 @@ import UClient from "src/classes/UClient";
 import db_GuildsManager from "./models/guilds";
 import db_MembersManager from "./models/members";
 import CooldownManager from "./models/cooldowns";
+import { Collection } from "discord.js";
 
 export default class DatabaseManager {
     client: UClient;
