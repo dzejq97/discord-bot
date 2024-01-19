@@ -113,7 +113,7 @@ export default class CommandsManager {
         return false;
     }
 
-    async verifyRequirements(msg: Message, command: ICommand): Promise<boolean> {
+    private async verifyRequirements(msg: Message, command: ICommand): Promise<boolean> {
         if (!await this.cooldowns.check(msg, command)) return false;
         return true;
     }

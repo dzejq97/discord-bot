@@ -7,6 +7,7 @@ import path from 'node:path';
 import CommandsManager from "./CommandsManager";
 import { Logger } from './Logger';
 import DatabaseManager from "../database/DatabaseManager";
+import { HydratedGuild } from "src/database/models/guilds";
 
 export default class UClient extends Client{
     config = config;
@@ -16,6 +17,7 @@ export default class UClient extends Client{
     commands: CommandsManager;
     log: Logger = require('./Logger');
     database: DatabaseManager;
+    guilds_cache: Collection<string, HydratedGuild> = new Collection();
 
     constructor() {
         super(options);
@@ -36,7 +38,7 @@ export default class UClient extends Client{
             this.log.error(err, true);
         } finally {
             try {
-                //await this.login(process.env.TOKEN);
+                await this.login(process.env.TOKEN);
             } catch (err) {
                 this.log.error(err, true);
             }
@@ -70,8 +72,8 @@ export default class UClient extends Client{
             this.log.info(`Loading module from ${moduleDir}`);
             const moduleFilePath = path.join(modulesPath, moduleDir, 'module.js');
             const module = require(moduleFilePath);
-            this.modules.set(module.meta.name, module);
             await module.load(this);
+            this.modules.set(module.meta.name, module);
         }
         this.log.success('Modules loaded')
     }

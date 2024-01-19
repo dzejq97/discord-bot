@@ -56,6 +56,9 @@ export class Logger {
         this.logStream.write(str);
         str = `${this.timestamp()} ${chalk.black.bgRed('ERROR')} ${errorMessage}`;
         console.log(str);
+        if (error instanceof Error) {
+            console.log(error.stack)
+        }
         if (fatal) {
             str = chalk.black.bgRed('FATAL ERROR') + 'script is executed due to fatal error';
             console.log(str);

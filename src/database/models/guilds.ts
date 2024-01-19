@@ -1,27 +1,36 @@
 import { Schema, model, Types, Model, HydratedDocument, Document} from 'mongoose';
 import { default_prefix } from '../../config.json'
 import UClient from 'src/classes/UClient';
-import { Collection, Guild } from 'discord.js';
+import { Collection, Guild, GuildMember } from 'discord.js';
 import DatabaseManager from '../DatabaseManager';
+import { HydratedMember } from './members';
 
 interface IGuild {
+    //Instance params
+    client: UClient,
+    //Schema params
     id: string,
     join_at: Date,
     owner_id: string,
     members: Types.ObjectId[],
-    config: IGuildConfig
+    config: IGuildConfig,
+    modules_config: Map<string, Object>
 }
 
 interface IGuildConfig {
-    _id: Types.ObjectId,
+    _id: Types.ObjectId;
     prefix: string;
 }
 
 interface IGuildMethods {
-    update(database: DatabaseManager): Promise<boolean>,
+    cacheSave(): Promise<boolean>,
+    addMember(member: HydratedMember | GuildMember | string): Promise<void>,
+    removeMember(member: HydratedMember | GuildMember | string): Promise<void>,
+    remove(): Promise<boolean>
 }
 
-type GuildModelType = Model<IGuild, {}, IGuildMethods>;
+export type GuildModelType = Model<IGuild, {}, IGuildMethods>;
+export type HydratedGuild = HydratedDocument<IGuild, IGuildMethods>
 
 const schema = new Schema<IGuild, GuildModelType, IGuildMethods>({
     id: { type: String, required: true, unique: true },
@@ -30,28 +39,26 @@ const schema = new Schema<IGuild, GuildModelType, IGuildMethods>({
     owner_id: { type: String, required: true },
 
     config: new Schema<IGuildConfig>({
-        _id: { type: Schema.Types.ObjectId, default: new Types.ObjectId()},
         prefix: { type: String, default: default_prefix }
-    })
+    }),
+    modules_config: { type: Map, of: Object, default: new Map() }
 });
-schema.method('update', async function update(database: DatabaseManager) {
-    database.guilds.guilds_configs.set(this.id, this.config);
+schema.method('cacheSave', async function cacheSave() {
+    if (!this.client) throw new Error('No client passed to GuildModel instance')
     try {
+        this.client.guilds_cache.set(this.id, this);
         await this.save();
-        database.guilds.cache.set(this.id, this);
     } catch (err) {
-        database.client.log.error(err);
+        this.client.log.error(err);
     }
-})
+});
 
 
 
 export default class db_GuildsManager {
     private client: UClient;
     private database: DatabaseManager;
-    private GuildModel: GuildModelType = model<IGuild, GuildModelType>('Guild', schema);
-    cache: Collection<string, HydratedDocument<IGuild>> = new Collection();
-    guilds_configs: Collection<string, IGuildConfig> = new Collection();
+    GuildModel: GuildModelType = model<IGuild, GuildModelType>('Guild', schema);
 
     constructor(client: UClient) {
         this.client = client;
@@ -64,6 +71,8 @@ export default class db_GuildsManager {
         if (guild instanceof Guild) id = guild.id;
         else id = guild;
 
+        if (this.client.guilds_cache.has(id)) return true;
+
         let result;
         try{
             result = await this.GuildModel.exists({ id: id });
@@ -75,16 +84,30 @@ export default class db_GuildsManager {
         else return false;
     }
 
-    async get(guild: Guild | string): Promise<HydratedDocument<IGuild> | null> {
+    async getAll(): Promise<HydratedGuild[] | null> {
+        try {
+            const docs = await this.GuildModel.find();
+            if (docs) { 
+                docs.forEach(v => v.client = this.client);
+                return docs;
+            }
+            else return null;
+        } catch (err) {
+            this.client.log.error(err);
+        }
+        return null;
+    }
+
+    async get(guild: Guild | string): Promise<HydratedGuild | null> {
         let id: string | null = null;
         if (guild instanceof Guild) id = guild.id;
         else id = guild;
 
+        if (this.client.guilds_cache.has(id)) return this.client.guilds_cache.get(id)!;
+
         if (!id) return null;
         else {
-            let doc;
-            doc = this.cache.get(id);
-            if (doc) return doc;
+            let doc: HydratedGuild | undefined | null;
 
             try{
                 doc = await this.GuildModel.findOne({ id: id });
@@ -92,36 +115,64 @@ export default class db_GuildsManager {
                 this.client.log.error(err);
                 return null;
             }
-
+            
             if(!doc) return null;
             else {
-                this.cache.set(doc.id, doc);
-                this.guilds_configs.set(doc.id, doc.config);
+                doc.client = this.client;
                 return doc;
             }
         }
     }
 
-    async getOrCreate(guild: Guild): Promise<HydratedDocument<IGuild> | null> {
-        let doc;
-        
-        doc = this.cache.get(guild.id);
-        if (doc) return doc;
+    async getOrCreate(guild: Guild): Promise<HydratedGuild | null> {
+        let doc: HydratedGuild | undefined | null;
+
+        if (this.client.guilds_cache.has(guild.id)) return this.client.guilds_cache.get(guild.id)!;
 
         try {
             doc = await this.GuildModel.findOne({ id: guild.id });
             if (!doc) {
-                doc = await this.GuildModel.create({
+                doc = new this.GuildModel({
                     id: guild.id,
-                    owner_id: guild.ownerId
-                });                
+                    owner_id: guild.ownerId,
+                    config: {
+                        _id: new Types.ObjectId(),
+                    }
+                });
+
+                for (const module of this.client.modules.values()) {
+                    if (module.default_config) {
+                        doc.modules_config.set(module.meta.name, module.default_config);
+                    }
+                }
+                doc.client = this.client;
+
+                await doc.cacheSave();
                 return doc;
             } else {
+                doc.client = this.client;
                 return doc;
             }
         } catch (err) {
             this.client.log.error(err);
             return null;
         }
+    }
+
+    async remove(guild: string | Guild) {
+        let guild_id;
+
+        if (guild instanceof Guild) guild_id = guild.id;
+        else guild_id = guild;
+
+        if (this.client.guilds_cache.has(guild_id)) this.client.guilds_cache.delete(guild_id);
+
+        try{
+            await this.GuildModel.deleteMany({ id: guild_id });
+            await this.database.members.MemberModel.deleteMany({ guild_id: guild_id });
+        } catch (err) {
+            this.client.log.error(err);
+        }
+        this.client.log.info(`Guild ${guild_id} and its members removed from database`);
     }
 }

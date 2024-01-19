@@ -17,7 +17,8 @@ interface IMemberMethods {
     update(database: DatabaseManager): Promise<boolean>,
 }
 
-type MemberModelType = Model<IMember, {}, IMemberMethods>;
+export type MemberModelType = Model<IMember, {}, IMemberMethods>;
+export type HydratedMember = HydratedDocument<IMember, IMemberMethods>
 
 const schema = new Schema<IMember, MemberModelType, IMemberMethods>({
     id: { type: String, required: true },
@@ -41,7 +42,7 @@ schema.method('update', async function update(database: DatabaseManager) {
 export default class db_MembersManager {
     private client: UClient;
     private database: DatabaseManager;
-    cache: Collection<string, HydratedDocument<IMember>> = new Collection();
+    cache: Collection<string, HydratedMember> = new Collection();
     MemberModel: MemberModelType = model<IMember, MemberModelType>('Member', schema);
 
     constructor(client: UClient) {
@@ -71,7 +72,22 @@ export default class db_MembersManager {
         else return false;
     }
 
-    async get(member: string | User | GuildMember, guild: string | Guild): Promise<HydratedDocument<IMember> | null> {
+    async getAll(guild: string | Guild): Promise<HydratedMember[] | null> {
+        let guild_id;
+        if (guild instanceof Guild) guild_id = guild.id;
+        else guild_id = guild;
+
+        try {
+            const docs = await this.MemberModel.find({guild_id: guild_id});
+            if (docs) return docs;
+            else return null;
+        } catch (err) {
+            this.client.log.error(err);
+        }
+        return null;
+    }
+
+    async get(member: string | User | GuildMember, guild: string | Guild): Promise<HydratedMember | null> {
         let member_id: string, guild_id: string;
         if (member instanceof User || member instanceof GuildMember)
             member_id = member.id;
@@ -82,7 +98,7 @@ export default class db_MembersManager {
 
         if (!guild_id || !member_id) return null;
         else {
-            let doc: HydratedDocument<IMember> | null = null;
+            let doc: HydratedMember | null = null;
             try {
                 doc = await this.MemberModel.findOne({ id: member_id, guild_id: guild_id });
             } catch (err) {
@@ -95,9 +111,9 @@ export default class db_MembersManager {
         }
     }
 
-    async getOrCreate(member: string | User | GuildMember, guild: string | Guild): Promise<HydratedDocument<IMember> | null> {
+    async getOrCreate(member: string | User | GuildMember, guild: string | Guild): Promise<HydratedMember | null> {
         let member_id: string, guild_id: string
-        let doc: HydratedDocument<IMember> | null = null;
+        let doc: HydratedMember | null = null;
 
         if (member instanceof User || member instanceof GuildMember)
             member_id = member.id;
@@ -115,6 +131,7 @@ export default class db_MembersManager {
                     id: member_id,
                     guild_id: guild_id,
                 });
+
                 return doc;
             } else {
                 return doc;
@@ -123,5 +140,22 @@ export default class db_MembersManager {
             this.client.log.error(err);
             return null;
         }
+    }
+
+    async remove(member: string | User| GuildMember, guild: string | Guild) {
+        let member_id: string, guild_id: string;
+        if (member instanceof User || member instanceof GuildMember)
+            member_id = member.id;
+        else member_id = member;
+
+        if (guild instanceof Guild) guild_id = guild.id;
+        else guild_id = guild;
+
+        try {
+            await this.MemberModel.deleteMany({ id: member_id, guild_id: guild_id });
+        } catch (err) {
+            this.client.log.error(err);
+        }
+        this.client.log.info(`Removed member ${member_id} of guild ${guild_id} from database`);
     }
 }

@@ -1,4 +1,4 @@
-import { Events } from "discord.js";
+import { Collection, Events } from "discord.js";
 import UClient from "src/classes/UClient";
 import IEvent from "src/interfaces/IEvent";
 

@@ -1,17 +1,17 @@
-import { Collection, Events } from "discord.js";
+import { Collection } from "discord.js";
 import UClient from "./UClient";
 import fs from 'node:fs';
 import path from 'node:path'
 import ICommand from "src/interfaces/ICommand";
 import IEvent from "src/interfaces/IEvent";
-import { Model } from "mongoose";
 import IModuleMeta from "src/interfaces/IModuleMeta";
+import { HydratedGuild} from "src/database/models/guilds";
 
 export default class Module {
-    private client: UClient | undefined;
+    client: UClient | undefined;
     meta: IModuleMeta | undefined;
     commands: Collection<string, ICommand> = new Collection();
-    models: Collection<string, Model<any>> = new Collection();
+    default_config: any;
 
     async load(client: UClient): Promise<void> {
         if (!this.meta) throw new Error('Module meta is undefined');
@@ -68,6 +68,23 @@ export default class Module {
             }
             client.log.info(`Loaded ${this.meta.name} commands`)
         }
+
+        ////////////////////////
+        /*
+        client.log.info(`Loading and synchronizing module config`);
+        if (this.config) {
+            const oaGuilds = await this.client.guilds.fetch();
+            for (const oaGuild of oaGuilds.values()) {
+                const doc: HydratedGuild | null = await this.client.database.guilds.get(oaGuild.id);
+                if (!doc) throw new Error('Failed syncing module config. No guild document in database.');
+
+                if (!doc.modules_config.has(this.meta.name)) {
+                    doc.modules_config.set(this.meta.name, this.config);
+                    await doc.update(this.client.database);
+                }
+            }
+        }*/
+        //////////////////////
         client.log.success(`Loaded ${this.meta.name} module`);
     }
 }
