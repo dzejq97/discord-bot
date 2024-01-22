@@ -12,7 +12,7 @@ export default class CommandContext {
     command?: ICommand;
     used_prefix?: string;
     used_alias?: string;
-    args?: Array<string>;
+    args?: string[];
 
     constructor(client: UClient, message: Message) {
         this.client = client;

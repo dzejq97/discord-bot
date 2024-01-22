@@ -67,7 +67,9 @@ export default class CommandsManager {
                 context.command = command;
 
                 if (command.subcommands && context.args && context.args[0]) {
-                    const subcommand = command.subcommands.find(sub => sub.meta.name === context.args![0].toLowerCase());
+                    let subcommand = command.subcommands.find(sub => sub.meta.name === context.args![0].toLowerCase());
+                    if (!subcommand)
+                        subcommand = command.subcommands.find(sub => sub.meta.aliases?.find(alias => alias === context.args![0].toLowerCase()));
                     if (subcommand && await this.verifyRequirements(msg, subcommand)) {
                         context.args.shift();
                         if (subcommand.meta.autodelete_trigger_message) await msg.delete();
@@ -90,18 +92,20 @@ export default class CommandsManager {
                         context.command = command;
 
                         if (command.subcommands && context.args && context.args[0]) {
-                            const subcommand = command.subcommands.find(sub => sub.meta.name === context.args![0].toLowerCase());
+                            let subcommand = command.subcommands.find(sub => sub.meta.name === context.args![0].toLowerCase());
+                            if (!subcommand)
+                                subcommand = command.subcommands.find(sub => sub.meta.aliases?.find(alias => alias === context.args![0].toLowerCase()));
                             if (subcommand && await this.verifyRequirements(msg, subcommand)) {
                                 context.args.shift();
                                 if (subcommand.meta.autodelete_trigger_message) await msg.delete();
-                                await subcommand.execute(context);
+                                subcommand.execute(context);
                                 return true;
                             }
                         }
 
                         if (await this.verifyRequirements(msg, command)) {
                             if (command.meta.autodelete_trigger_message) await msg.delete();
-                            await command.execute(context);
+                            command.execute(context);
                             return true;
                         }
 

@@ -7,6 +7,5 @@ module.exports = <IEvent> {
     once: true,
 
     async execute(client: UClient) {
-        console.log('test');
     }
 }

@@ -23,7 +23,7 @@ interface IGuildConfig {
 }
 
 interface IGuildMethods {
-    cacheSave(): Promise<boolean>,
+    cache(): Promise<boolean>,
     addMember(member: HydratedMember | GuildMember | string): Promise<void>,
     removeMember(member: HydratedMember | GuildMember | string): Promise<void>,
     remove(): Promise<boolean>
@@ -43,11 +43,10 @@ const schema = new Schema<IGuild, GuildModelType, IGuildMethods>({
     }),
     modules_config: { type: Map, of: Object, default: new Map() }
 });
-schema.method('cacheSave', async function cacheSave() {
+schema.method('cache', async function cache() {
     if (!this.client) throw new Error('No client passed to GuildModel instance')
     try {
         this.client.guilds_cache.set(this.id, this);
-        await this.save();
     } catch (err) {
         this.client.log.error(err);
     }
@@ -119,6 +118,7 @@ export default class db_GuildsManager {
             if(!doc) return null;
             else {
                 doc.client = this.client;
+                doc.cache();
                 return doc;
             }
         }
@@ -147,7 +147,8 @@ export default class db_GuildsManager {
                 }
                 doc.client = this.client;
 
-                await doc.cacheSave();
+                await doc.cache();
+                await doc.save();
                 return doc;
             } else {
                 doc.client = this.client;

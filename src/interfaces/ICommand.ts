@@ -1,6 +1,11 @@
 import CommandContext from "src/classes/CommandContext";
 import { PermissionFlagsBits } from "discord.js";
 
+export const ArgumentsTypes = [
+    'channel', 'member', 'role',
+    'word', 'string', 'time',
+];
+
 export default interface ICommand {
     module?: any,
     subcommands?: ICommand[],
@@ -10,6 +15,7 @@ export default interface ICommand {
         aliases?: string[],
         autodelete_trigger_message?: boolean;
         autodelete_reply_message?: boolean;
+        arguments?: string[];
         requirements?: {
             only_guild_owner?: boolean, // If true command can be executed only by guild owner
             only_guild_administrator?: boolean, // If true command can be executed only by member with admin privilages

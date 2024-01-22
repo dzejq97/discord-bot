@@ -51,7 +51,7 @@ export default class DatabaseManager {
                     doc?.members.push(m._id)
             }
 
-            await doc?.cacheSave();
+            await doc?.cache();
 
             // Clear members left during offline
             const db_members = await this.members.getAll(guild);
